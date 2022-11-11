@@ -1,0 +1,101 @@
+\documentclass[a4paper,12pt]{ETHexercise}
+\usepackage{bbm}
+
+\input{preamble}
+
+\usepackage{multirow}
+\title{NLP Assignment}
+\begin{document}
+\setserie{1}
+
+
+
+\lectureheader{Prof. Ryan Cotterell}
+{}
+{\Large Natural Language Processing}{Fall 2022}
+\begin{center}
+    {\Huge Yannick Wattenberg: Assignment 02}\\
+      \quad\newline
+      ywattenberg@inf.ethz.ch, 19-947-464.\\
+      \quad\newline
+    \timestamp
+
+\end{center}
+\section{Question: Entropy of a Conditional Random Field}
+\subsection*{a)}
+Prove that the \textbf{expectation semiring} satisfies the semiring axioms:
+
+Let $x_1, y_1, x_2, y_2, x_3, y_3 \in \R$ for this subsection.
+\subsubsection*{Axiom 1}
+\begin{align*}
+    (\R \times \R, \oplus, \pair{0}{0}) \text{ is a commutative monoid with identity element } \pair{0}{0}
+\end{align*}
+
+Associativity and Commutativity of $\oplus$:
+\begin{align}
+    (\pair{x_1}{y_1} \oplus \pair{x_2}{y_2}) \oplus \pair{x_3}{y_3} &\stackrel{!}{=} \pair{x_1}{y_1} \oplus (\pair{x_3}{y_3} \oplus \pair{x_2}{y_2})\\
+     (\pair{x_1}{y_1} \oplus \pair{x_2}{y_2}) \oplus \pair{x_3}{y_3} &= \pair{x_1+x_2}{y_1+y_2} \oplus \pair{x_3}{y_3} &&(\text{def. } \oplus)\\
+     &= \pair{(x_1+x_2)+x_3}{(y_1+y_2)+y_3} &&(\text{def. } \oplus)\\
+     &= \pair{x_1+(x_2+x_3)}{y_1+(y_2+y_3)} &&(\text{ass. of } +)\\
+     &= \pair{x_1}{y_1} \oplus \pair{x_2+x_3}{y_2+y_3}&&(\text{def. } \oplus)\\
+     &= \pair{x_1}{y_1} \oplus \pair{x_3+x_2}{y_3+y_2}&&(\text{comm. of }+)\\
+     &= \pair{x_1}{y_1} \oplus (\pair{x_3}{y_3} \oplus \pair{x_2}{y_2}) &&(\text{def. } \oplus)
+\end{align}
+
+$\pair{0}{0}$ is the identity element:
+\begin{align}
+    \pair{0}{0} \oplus \pair{x_1}{y_1} &\stackrel{!}{=} \pair{x_1}{y_1}\\
+    \pair{0}{0} \oplus \pair{x_1}{y_1} &= \pair{x_1+0}{y_1+0} &&(\text{def. } \oplus)\\
+    &=  \pair{x_1}{y_1}
+\end{align}
+
+\subsubsection*{Axiom 2}
+\begin{align*}
+    (\R \times \R, \otimes, \pair{1}{0}) \text{ is a monoid with identity element } \pair{1}{0}
+\end{align*}
+
+Associativity of $\otimes$:
+\begin{align}
+    &(\pair{x_1}{y_1} \otimes \pair{x_2}{y_2}) \otimes \pair{x_3}{y_3} \stackrel{!}{=} \pair{x_1}{y_1} \otimes (\pair{x_2}{y_2} \otimes \pair{x_3}{y_3})\\
+    &(\pair{x_1}{y_1} \otimes \pair{x_2}{y_2}) \otimes \pair{x_3}{y_3} =
+    \pair{x_1 \cdot x_2}{x_1 \cdot y_2 + y_1 \cdot x_2} \otimes \pair{x_3}{y_3} &&(\text{def. } \otimes)\\
+    =  &\pair{(x_1 \cdot x_2) \cdot x_3}{(x_1 \cdot x_2) \cdot y_3 + (x_1 \cdot y_2 + y_1 \cdot x_2) \cdot x_3} &&(\text{def. } \otimes)\\
+    =  &\pair{(x_1 \cdot x_2) \cdot x_3}{x_1 \cdot x_2 \cdot y_3 + x_1 \cdot y_2 \cdot x_3 + y_1 \cdot x_2 \cdot x_3 } &&(\text{diss. } \cdot)\\ 
+    =  &\pair{(x_1 \cdot x_2) \cdot x_3}{x_1 \cdot (x_2 \cdot y_3 + y_2 \cdot x_3) + y_1 \cdot x_2 \cdot x_3 } &&(\text{diss. } \cdot)\\
+    =  &\pair{x_1 \cdot( x_2 \cdot x_3)}{x_1 \cdot (x_2 \cdot y_3 + y_2 \cdot x_3) + y_1 \cdot (x_2 \cdot x_3) } &&(\text{ass. } \cdot)\\
+    =  &\pair{x_1}{y_1} \otimes \pair{ x_2 \cdot x_3}{x_2 \cdot y_3 + y_2 \cdot x_3} &&(\text{def. } \otimes)\\
+    =  &\pair{x_1}{y_1} \otimes (\pair{x_2}{y_2} \otimes \pair{x_3}{y_3}) &&(\text{def. } \otimes)
+\end{align}
+
+$\pair{1}{0}$ is the identity element:
+\begin{align}
+    \pair{x_1}{y_1} \otimes \pair{1}{0} &\stackrel{!}{=} \pair{x_1}{y_1}\\
+    \pair{x_1}{y_1} \otimes \pair{1}{0} &= \pair{x_1 \cdot 1}{x_1 \cdot 0 + y_1 \cdot 1} &&(\text{def. } \otimes)\\
+    &=  \pair{x_1}{y_1}
+\end{align}
+
+\subsubsection*{Axiom 3}
+$\otimes$ distributes left and right over $\oplus$:
+\begin{align}
+        &\pair{x_1}{y_1} \otimes (\pair{x_2}{y_2} \oplus \pair{x_3}{y_3}) \stackrel{!}{=} (\pair{x_1}{y_1} \otimes \pair{x_2}{y_2}) \oplus (\pair{x_1}{y_1} \otimes\pair{x_3}{y_3})
+\end{align}
+\begin{align}
+    &\pair{x_1}{y_1} \otimes (\pair{x_2}{y_2} \oplus \pair{x_3}{y_3}) = \pair{x_1}{y_1} \otimes \pair{x_2 + x_3}{y_2 + y_3} &&(\text{def. }\oplus)\\
+    = &\pair{x_1 \cdot (x_2 + x_3)}{x_1 \cdot (x_2 + x_3) + y_1 \cdot (y_2 + y_3)} &&(\text{def. }\otimes)\\
+    = &\pair{(x_1 \cdot x_2) + (x_1 \cdot x_3)}{ (x_1 \cdot y_2) + (y_1 \cdot x_2) + (x_1 \cdot y_3)  + (y_1 \cdot x_3)} &&(\text{diss. }\cdot)\\
+    = &\pair{x_1 \cdot x_2}{(x_1 \cdot y_2) + (y_1 \cdot x_2)} \oplus \pair{x_1 \cdot x_3}{(x_1 \cdot y_3)  + (y_1 \cdot x_3)} &&(\text{def. }\oplus)\\
+    =   &(\pair{x_1}{y_1} \otimes \pair{x_2}{y_2}) \oplus (\pair{x_1}{y_1} \otimes \pair{x_3}{y_3}) &&(\text{def. }\otimes)
+\end{align}
+
+\begin{align}
+        &(\pair{x_2}{y_2} \oplus \pair{x_3}{y_3}) \otimes \pair{x_1}{y_1} \stackrel{!}{=} (\pair{x_2}{y_2} \otimes \pair{x_1}{y_1}) \oplus (\pair{x_3}{y_3} \otimes \pair{x_1}{y_1})
+\end{align}
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
