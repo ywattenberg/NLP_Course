@@ -119,11 +119,75 @@ The definition of the forward algorithm is as follows:
     \SetAlgoLined
     \caption{Forward algorithm}
     \label{alg:forward}
-    $\beta(w, t_0) = \mathbb{1}$\\
+    $\beta(\textbf{w}, t_0) = \mathbbm{1}$\\
     \For{$i = 1$ \KwTo $N$}{
-        $v_t = \oplus_{t_i \in T} v_i \otimes $
+        $\beta(\textbf{w}, t_i) = \oplus_{t_i \in T} exp(score(t_i, t_{i+1}, \textbf{w}))\otimes \beta(\textbf{w}, t_{i-1})$
     }
 \end{algorithm}
+We raise this into the expectation semiring by replacing the $\oplus$ and $\otimes$ with the corresponding operations in the expectation semiring. We also replace the initialization of $\beta(w, t_0)$ with the neutral element of multiplication in the expectation semiring. Which yields the following algorithm:
+
+\begin{algorithm}
+    \SetAlgoLined
+    \caption{Forward algorithm in the expectation semiring}
+    \label{alg:forward_expectation}
+    $\beta(\textbf{w}, t_0) = \pair{1}{0}$\\
+    \For{$i = 1$ \KwTo $N$}{
+        $w = exp(score(t_{i-1}, t_i, \textbf{w}))$\\
+        $\beta(\textbf{w}, t_i) = \oplus_{t_i \in T} \pair{w}{-w \cdot logw}\otimes \beta(\textbf{w}, t_{i-1})$
+    }
+\end{algorithm}
+We want to prove that the result of the forward algorithm lifted in the expectation semiring computes the unnormalized Entropy defined as:
+\begin{align}
+    H_u(T_\textbf{w}) &= -\sum_{t \in T^N} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})\\
+\end{align}
+
+We prove the statement by induction on the length of the sequence $N$. The base case is trivial, since the forward algorithm only computes the score of the first token:
+\begin{align}
+    \beta(\textbf{w}, t_1) &= \oplus_{t_1 \in T} \pair{w}{-w \cdot logw} \otimes \pair{1}{0}\\
+    (\text{def. }\otimes) &= \oplus_{t_1 \in T} \pair{w}{-w \cdot logw} \\
+    (\text{def. }w) &= \oplus_{t_1 \in T}\pair{exp(score(t_{0}, t_1, \textbf{w}))}{-exp(score(t_{0}, t_1, \textbf{w})) \cdot score(t_{0}, t_1, \textbf{w})}\\
+    (\text{def. }\oplus)&= \pair{\sum_{t \in T^1}exp(score(t_{0}, t_1, \textbf{w}))}{-\sum_{t \in T^1} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})}
+\end{align}
+Our induction hypothesis is that the forward algorithm computes the unnormalized entropy for sequences of length $i$:
+\begin{align}
+    \beta(\textbf{w}, t_i) = \pair{\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})}
+\end{align}
+Induction step ($i \rightarrow i+1$):
+\begin{align}
+    \beta(\textbf{w}, t_{i+1}) = &\oplus_{t_{i+1} \in T} \pair{w}{-w \cdot logw} \otimes \beta(\textbf{w}, t_i)\\
+    = &\oplus_{t_{i+1} \in T} \pair{w}{-w \cdot logw} \otimes \\ 
+    &\pair{\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})} &&(\text{IH})\\
+    = &\langle  \sum_{t_{i+1}\in T}\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))  , \label{eq:p1}\\ 
+    &\sum_{t_{i+1}\in T} w \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})) \label{eq:p2}\\
+    -&\sum_{t_{i+1}\in T} w \cdot log(w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))) \rangle \label{eq:p3}\\
+    (\ref{eq:p1}) \Rightarrow &\sum_{t_{i+1}\in T} w \cdot \sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))\\
+    = &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot \sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) &&(\text{def. }w) \\
+    = &\sum_{t \in T^i} \sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1} \textbf{w}))\\
+    = &\sum_{t \in T^{i+1}} exp(score_\Theta(t,\textbf{w})) \label{eq:p1r}\\
+    (\ref{eq:p2}) \Rightarrow & \sum_{t_{i+1}\in T} w \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w}))\\
+    = &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})) &&(\text{def. }w)\\
+    = &-\sum_{t \in T^i}\sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score_\Theta(t,\textbf{w}) \label{eq:p2r}\\
+    (\ref{eq:p3}) \Rightarrow &\sum_{t_{i+1}\in T} w \cdot log(w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})))\\
+    = &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, w)) \cdot score(t_{i}, t_{i+1},w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))) &&(\text{def. }w)\\
+    = &\sum_{t \in T^i} \sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score(t_{i}, t_{i+1}, \textbf{w}) \label{eq:p3r}
+\end{align}
+
+\begin{align}
+    (\ref{eq:p2r} - \ref{eq:p3r}) \Rightarrow -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score_\Theta(t,\textbf{w})\\
+    -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score(t_{i}, t_{i+1}, \textbf{w})\\
+    = -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot (score_\Theta(t,\textbf{w}) \cdot score(t_{i}, t_{i+1}, \textbf{w})) \\
+    = -\sum_{t \in T^{i+1}} &exp(score_\Theta(t,\textbf{w})) \cdot (score_\Theta(t,\textbf{w})) \label{eq:p3and4}
+\end{align}
+Together (\ref{eq:p1r}) and (\ref{eq:p3and4}), we have:
+\begin{align}
+    \langle \sum_{t \in T^{i+1}} exp(score_\Theta(t,\textbf{w})) , \sum_{t \in T^{i+1}} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w}) \rangle
+\end{align}
+Concluding the proof.
+From this we can follow that
+\begin{align}
+    \beta(w, t_{N}) = \pair{\sum_{t \in T^N} exp(score_\Theta(t,\textbf{w}))}{-\sum_{t \in T^N} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})}
+\end{align}
+Which shows that the second part of the pair is equal to the unnormalized entropy. 
 \subsection*{c)}
 
 \end{document}
