@@ -156,19 +156,19 @@ Induction step ($i \rightarrow i+1$):
 \begin{align}
     \beta(\textbf{w}, t_{i+1}) = &\oplus_{t_{i+1} \in T} \pair{w}{-w \cdot logw} \otimes \beta(\textbf{w}, t_i)\\
     = &\oplus_{t_{i+1} \in T} \pair{w}{-w \cdot logw} \otimes \\ 
-    &\pair{\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})} &&(\text{IH})\\
+    &\pair{\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})} \quad (\text{IH})\\
     = &\langle  \sum_{t_{i+1}\in T}\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))  , \label{eq:p1}\\ 
     &\sum_{t_{i+1}\in T} w \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})) \label{eq:p2}\\
     -&\sum_{t_{i+1}\in T} w \cdot log(w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))) \rangle \label{eq:p3}\\
     (\ref{eq:p1}) \Rightarrow &\sum_{t_{i+1}\in T} w \cdot \sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))\\
-    = &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot \sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) &&(\text{def. }w) \\
+    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot \sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))\\
     = &\sum_{t \in T^i} \sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1} \textbf{w}))\\
     = &\sum_{t \in T^{i+1}} exp(score_\Theta(t,\textbf{w})) \label{eq:p1r}\\
     (\ref{eq:p2}) \Rightarrow & \sum_{t_{i+1}\in T} w \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w}))\\
-    = &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})) &&(\text{def. }w)\\
+    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w}))\\
     = &-\sum_{t \in T^i}\sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score_\Theta(t,\textbf{w}) \label{eq:p2r}\\
     (\ref{eq:p3}) \Rightarrow &\sum_{t_{i+1}\in T} w \cdot log(w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})))\\
-    = &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, w)) \cdot score(t_{i}, t_{i+1},w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))) &&(\text{def. }w)\\
+    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, w)) \cdot score(t_{i}, t_{i+1},w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})))\\
     = &\sum_{t \in T^i} \sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score(t_{i}, t_{i+1}, \textbf{w}) \label{eq:p3r}
 \end{align}
 
