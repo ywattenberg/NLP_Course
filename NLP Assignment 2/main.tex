@@ -47,6 +47,8 @@ $\pair{0}{0}$ is the identity element:
     \pair{0}{0} \oplus \pair{x_1}{y_1} &\stackrel{!}{=} \pair{x_1}{y_1}\\
     \pair{0}{0} \oplus \pair{x_1}{y_1} &= \pair{x_1+0}{y_1+0} &&(\text{def. } \oplus)\\
     &=  \pair{x_1}{y_1}
+    &=  \pair{x_1 + 0}{y_1 + 0}
+    &= \pair{x_1}{y_1} \oplus \pair{0}{0} &&(\text{def. } \oplus)
 \end{align}
 
 \subsubsection*{Axiom 2}
@@ -71,7 +73,9 @@ $\pair{1}{0}$ is the identity element:
 \begin{align}
     \pair{x_1}{y_1} \otimes \pair{1}{0} &\stackrel{!}{=} \pair{x_1}{y_1}\\
     \pair{x_1}{y_1} \otimes \pair{1}{0} &= \pair{x_1 \cdot 1}{x_1 \cdot 0 + y_1 \cdot 1} &&(\text{def. } \otimes)\\
-    &=  \pair{x_1}{y_1}
+    &= \pair{x_1}{y_1}
+    &= \pair{1 \cdot x_1}{1 \cdot y_1 + 0 \cdot x_1}\\
+    &= \pair{1}{0} \otimes \pair{x_1}{y_1} &&(\text{def. } \otimes)
 \end{align}
 
 \subsubsection*{Axiom 3}
@@ -91,7 +95,36 @@ $\otimes$ distributes left and right over $\oplus$:
         &(\pair{x_2}{y_2} \oplus \pair{x_3}{y_3}) \otimes \pair{x_1}{y_1} \stackrel{!}{=} (\pair{x_2}{y_2} \otimes \pair{x_1}{y_1}) \oplus (\pair{x_3}{y_3} \otimes \pair{x_1}{y_1})
 \end{align}
 
+\begin{align}
+    &(\pair{x_2}{y_2} \oplus \pair{x_3}{y_3}) \otimes \pair{x_1}{y_1} = (\pair{x_2 + x_3}{y_2 + y_3}) \otimes \pair{x_1}{y_1} &&(\text{def. }\oplus)\\
+    = &\pair{(x_2 + x_3) \cdot x_1}{(x_2 + x_3) \cdot y_1 + (y_2 + y_3) \cdot x_1} &&(\text{def. }\otimes)\\
+    = &\pair{(x_2 \cdot x_1) \cdot (x_3 \cdot x_1)}{(x_2 \cdot y_1) + (x_3 \cdot y_1) + (y_2 \cdot x_1)+ (y_3 \cdot x_1)} &&(\text{diss. }\cdot)\\
+    = &\pair{x_2 \cdot x_1}{x_2 \cdot y_1 + y_2 \cdot x_1} \oplus \pair{x_3 \cdot x_1}{x_3 \cdot y_1 + y_3 \cdot x_1} &&(\text{def. }\oplus)\\
+    = &(\pair{x_2}{y_2} \otimes \pair{x_1}{y_1}) \oplus (\pair{x_3}{y_3} \otimes \pair{x_1}{y_1}) &&(\text{def. }\otimes)
+\end{align}
 
+\subsubsection*{Axiom 4}
+\begin{align}
+    \pair{0}{0} \otimes \pair{x_1}{y_1} &\stackrel{!}{=} \pair{0}{0} \stackrel{!}{=} \pair{x_1}{y_1} \otimes \pair{0}{0}\\
+    \pair{0}{0} \otimes \pair{x_1}{y_1} &= \pair{0 \cdot x_1}{0 \cdot y_1 + 0 \cdot x_1} &&(\text{def. }\otimes)\\
+    &= \pair{0}{0}\\
+    &= \pair{x_1 \cdot 0}{x_1 \cdot 0 + y_1 \cdot 0} \\
+    &= \pair{x_1}{y_1} \otimes \pair{0}{0} &&(\text{def. }\otimes)
+\end{align}
+With this we have proven that the \textbf{expectation semiring} is a semiring.
+
+\subsection*{b)}
+The definition of the forward algorithm is as follows:
+\begin{algorithm}
+    \SetAlgoLined
+    \caption{Forward algorithm}
+    \label{alg:forward}
+    $\beta(w, t_0) = \mathbb{1}$\\
+    \For{$i = 1$ \KwTo $N$}{
+        $v_t = \oplus_{t_i \in T} v_i \otimes $
+    }
+\end{algorithm}
+\subsection*{c)}
 
 \end{document}
 
