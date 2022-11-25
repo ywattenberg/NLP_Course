@@ -143,55 +143,66 @@ We want to prove that the result of the forward algorithm lifted in the expectat
     H_u(T_\textbf{w}) &= -\sum_{t \in T^N} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})\\
 \end{align}
 The lifted forward algorithm is then equal to:
+\begin{align}
+    \bigoplus_{t_{1:N} \in T^N} \bigotimes_{n=1}^N \pair{w}{-w \cdot \log(w)}
+\end{align}
 
 
 We prove the statement by induction on the length of the sequence $N$. The base case is trivial, since the forward algorithm only computes the score of the first token:
 \begin{align}
-    \beta(\textbf{w}, t_1) &= \oplus_{t_0 \in T} \pair{w}{-w \cdot logw} \otimes \pair{1}{0}\\
-    (\text{def. }\otimes) &= \oplus_{t_0 \in T} \pair{w}{-w \cdot logw} \\
-    (\text{def. }w) &= \oplus_{t_0 \in T}\pair{exp(score(t_{0}, t_1, \textbf{w}))}{-exp(score(t_{0}, t_1, \textbf{w})) \cdot score(t_{0}, t_1, \textbf{w})} \label{eq:0} \\
-    (\text{def. }\oplus)&= \pair{\sum_{t \in T^1}exp(score(t_{0}, t_1, \textbf{w}))} {-\sum_{t \in T^1} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})} \label{eq:1}
+    &\bigoplus_{t_{1:1} \in T^1} \bigotimes_{n=1}^1 \pair{w}{-w \cdot \log(w)}\\
+    =  &\bigoplus_{t_1 \in T} \pair{w}{-w \cdot \log(w)}\\
+   (\text{def. w}) = &\bigoplus_{t_1 \in T} \pair{\exp(score(t_0, t_1, \textbf{w}))}{-\exp(score(t_0, t_1, \textbf{w})) \cdot score(t_0, t_1, \textbf{w})}\\
+    = &\bigoplus_{t \in T} \pair{\exp(score_\theta(t, \textbf{w}))}{-exp(score_\theta(t, \textbf{w})) \cdot score_\theta(t, \textbf{w})}\\
+    (\text{def. }\oplus) = &\pair{\sum_{t \in T^1} \exp(score_\theta(t, \textbf{w}))}{- \sum_{t \in T^1} exp(score_\theta(t, \textbf{w})) \cdot score_\theta(t, \textbf{w})}
 \end{align}
-The last step (\ref{eq:0} $=$ \ref{eq:1}) is possible as $\forall t_1 \in T$ is implicitly in this formula.
 Our induction hypothesis is that the forward algorithm computes the unnormalized entropy for sequences of length $i$:
-\begin{align}
-    \beta(\textbf{w}, t_i) = \pair{\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})}
-\end{align}
+\begin{align*}
+    \bigoplus_{t_{1:i} \in T^i} \bigotimes_{n=1}^i \pair{w}{-w \cdot \log(w)} = \pair{\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})}
+\end{align*}
 Induction step ($i \rightarrow i+1$):
-\begin{align}
-    \beta(\textbf{w}, t_{i+1}) = &\oplus_{t_{i} \in T} \pair{w}{-w \cdot \log w} \otimes \beta(\textbf{w}, t_i)\\
-    = &\oplus_{t_{i} \in T} \pair{w}{-w \cdot \log w} \otimes \\ 
-    &\pair{\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})} \quad (\text{IH})\\
-    = &\langle  \sum_{t_{i+1}\in T}\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))  , \label{eq:p1}\\ 
-    &\sum_{t_{i+1}\in T} w \cdot (-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})) \label{eq:p2}\\
-    -&\sum_{t_{i+1}\in T} w \cdot \log(w) \cdot (\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))) \rangle \label{eq:p3}\\
-    (\ref{eq:p1}) \Rightarrow &\sum_{t_{i+1}\in T} w \cdot \sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))\\
-    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot \sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))\\
-    = &\sum_{t \in T^i} \sum_{t_{i+1}\in T} exp(score_\theta(t,\textbf{w}) + score(t_{i}, t_{i+1} \textbf{w}))\\
-    = &\sum_{t \in T^{i+1}} exp(score_\theta(t,\textbf{w})) \label{eq:p1r}\\
-    (\ref{eq:p2}) \Rightarrow & \sum_{t_{i+1}\in T} w \cdot (-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w}))\\
-    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot (-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w}))\\
-    = &-\sum_{t \in T^i}\sum_{t_{i+1}\in T} exp(score_\theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \label{eq:p2r}\\
-    (\ref{eq:p3}) \Rightarrow &\sum_{t_{i+1}\in T} w \cdot \log(w) \cdot (\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})))\\
-    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, w)) \cdot score(t_{i}, t_{i+1},w) \cdot (\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})))\\
-    = &\sum_{t \in T^i} \sum_{t_{i+1}\in T} exp(score_\theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score(t_{i}, t_{i+1}, \textbf{w}) \label{eq:p3r}
+\begin{align} 
+    &\bigoplus_{t_{1:i+1} \in T^{i+1}} \bigotimes_{n=1}^{i+1} \pair{w}{-w \cdot \log(w)}\\
+    = &\bigoplus_{t_{i+1} \in T} \left( \bigoplus_{t_{1:i} \in T^{i}} \bigotimes_{n=1}^{i} \pair{w}{-w \cdot \log(w)} \right) \otimes \pair{w}{-w\log(w)} \\
+   \text{(def. IH)} = &\bigoplus_{t_{i+1} \in T} \pair{\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})} \\ 
+   &\otimes \pair{w}{-w\log(w)} \\
+   \text{(def. w)} = &\bigoplus_{t_{i+1} \in T} \pair{\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})} \\ 
+   &\otimes \pair{\exp(score(t_i, t_{i+1}, \textbf{w}))}{-\exp(score(t_i, t_{i+1}, \textbf{w}))\cdot score(t_i, t_{i+1}, \textbf{w})}
+   \label{eq:base}\\
+   &\left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w}))\label{eq:pull_in}\\
+   = & \sum_{t \in T^i} exp(score_\theta(t,\textbf{w}) + score(t_i, t_{i+1}, \textbf{w})) 
 \end{align}
-
+Further we also have:
 \begin{align}
-    (\ref{eq:p2r} - \ref{eq:p3r}) \Rightarrow -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w})\\
-    -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score(t_{i}, t_{i+1}, \textbf{w})\\
-    = -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot (score_\theta(t,\textbf{w}) \cdot score(t_{i}, t_{i+1}, \textbf{w})) \\
-    = -\sum_{t \in T^{i+1}} &exp(score_\theta(t,\textbf{w})) \cdot (score_\theta(t,\textbf{w})) \label{eq:p3and4}
+    &\left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot (-\exp(score(t_i, t_{i+1}, \textbf{w}))\cdot score(t_i, t_{i+1}, \textbf{w}))\\ 
+    + &\left( -\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})  \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w}))\\
+    = -&\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w}))\cdot score(t_i, t_{i+1}, \textbf{w})\\
+    - &\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}) + score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w})\\
+    = -&\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \cdot score(t_i, t_{i+1}, \textbf{w}) \label{eq:pull_out}
 \end{align}
-Together (\ref{eq:p1r}) and (\ref{eq:p3and4}), we have:
+Using the equalities from \eqref{eq:pull_in} to \eqref{eq:pull_in} we can rewrite the induction step as:
 \begin{align}
-    \langle \sum_{t \in T^{i+1}} exp(score_\theta(t,\textbf{w})) , \sum_{t \in T^{i+1}} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w}) \rangle
+    \ref{eq:base} \Rightarrow \bigoplus_{t_{i+1} \in T}
+    &\biggl< \left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w})), \\ 
+        &\left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot (-\exp(score(t_i, t_{i+1}, \textbf{w}))\cdot score(t_i, t_{i+1}, \textbf{w}))\\
+        + &\left( -\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})  \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w})) \biggr> \\
+    (\text{with }\ref{eq:pull_out}) = &\bigoplus_{t_{i+1} \in T}
+    \biggl< \left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w})), \\ 
+    &-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \cdot score(t_i, t_{i+1}, \textbf{w}) \biggr>\\
+    (\text{with }\ref{eq:pull_in}) = &\bigoplus_{t_{i+1} \in T}
+    \biggl< \sum_{t \in T^i} exp(score_\theta(t,\textbf{w}) + score(t_i, t_{i+1}, \textbf{w})) , \\ 
+    &-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \cdot score(t_i, t_{i+1}, \textbf{w})
+    \biggr>\\
+    (\text{def. }\oplus) = &\biggl<\sum_{t_{i+1} \in T} \sum_{t \in T^i} exp(score_\theta(t,\textbf{w}) + score(t_i, t_{i+1}, \textbf{w})) , \\ 
+    &-\sum_{t_{i+1} \in T}\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \cdot score(t_i, t_{i+1}, \textbf{w})
+    \biggr>\\
+     = &\biggl<\sum_{t \in T^{i+1}} exp(score_\theta(t,\textbf{w})), -\sum_{t \in T^{i+1}} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})\biggr>
 \end{align}
-Concluding the proof.
-From this, we can follow that
-\begin{align}
-    \beta(w, t_{N}) = \pair{\sum_{t \in T^N} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^N} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})}
-\end{align}
+Concluding the induction.\\
+From this, we can follow that:
+\begin{align*}
+    \bigoplus_{t_{1:N} \in T^N} \bigotimes_{n=1}^N \pair{w}{-w \cdot \log(w)} = \pair{\sum_{t \in T^N} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^N} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})}
+\end{align*}
 This shows that the second part of the pair is equal to the unnormalized entropy. 
 \subsection*{c)}
 To prove:
