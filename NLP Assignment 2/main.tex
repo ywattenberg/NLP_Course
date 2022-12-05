@@ -46,8 +46,8 @@ $\pair{0}{0}$ is the identity element:
 \begin{align}
     \pair{0}{0} \oplus \pair{x_1}{y_1} &\stackrel{!}{=} \pair{x_1}{y_1}\\
     \pair{0}{0} \oplus \pair{x_1}{y_1} &= \pair{x_1+0}{y_1+0} &&(\text{def. } \oplus)\\
-    &=  \pair{x_1}{y_1}
-    &=  \pair{x_1 + 0}{y_1 + 0}
+    &=  \pair{x_1}{y_1}\\
+    &=  \pair{x_1 + 0}{y_1 + 0}\\
     &= \pair{x_1}{y_1} \oplus \pair{0}{0} &&(\text{def. } \oplus)
 \end{align}
 
@@ -69,11 +69,12 @@ Associativity of $\otimes$:
     =  &\pair{x_1}{y_1} \otimes (\pair{x_2}{y_2} \otimes \pair{x_3}{y_3}) &&(\text{def. } \otimes)
 \end{align}
 
+
 $\pair{1}{0}$ is the identity element:
 \begin{align}
     \pair{x_1}{y_1} \otimes \pair{1}{0} &\stackrel{!}{=} \pair{x_1}{y_1}\\
     \pair{x_1}{y_1} \otimes \pair{1}{0} &= \pair{x_1 \cdot 1}{x_1 \cdot 0 + y_1 \cdot 1} &&(\text{def. } \otimes)\\
-    &= \pair{x_1}{y_1}
+    &= \pair{x_1}{y_1}\\
     &= \pair{1 \cdot x_1}{1 \cdot y_1 + 0 \cdot x_1}\\
     &= \pair{1}{0} \otimes \pair{x_1}{y_1} &&(\text{def. } \otimes)
 \end{align}
@@ -111,7 +112,7 @@ $\otimes$ distributes left and right over $\oplus$:
     &= \pair{x_1 \cdot 0}{x_1 \cdot 0 + y_1 \cdot 0} \\
     &= \pair{x_1}{y_1} \otimes \pair{0}{0} &&(\text{def. }\otimes)
 \end{align}
-With this we have proven that the \textbf{expectation semiring} is a semiring.
+With this, we have proven that the \textbf{expectation semiring} is a semiring.
 
 \subsection*{b)}
 The definition of the forward algorithm is as follows:
@@ -121,9 +122,10 @@ The definition of the forward algorithm is as follows:
     \label{alg:forward}
     $\beta(\textbf{w}, t_0) = \mathbbm{1}$\\
     \For{$i = 1$ \KwTo $N$}{
-        $\beta(\textbf{w}, t_i) = \oplus_{t_i \in T} exp(score(t_i, t_{i+1}, \textbf{w}))\otimes \beta(\textbf{w}, t_{i-1})$
+        $\beta(\textbf{w}, t_i) = \oplus_{t_{i-1} \in T} exp(score(t_{i-1}, t_i, \textbf{w}))\otimes \beta(\textbf{w}, t_{i-1})$
     }
 \end{algorithm}
+Where $\forall t_i \in T$ is implicit. 
 We raise this into the expectation semiring by replacing the $\oplus$ and $\otimes$ with the corresponding operations in the expectation semiring. We also replace the initialization of $\beta(w, t_0)$ with the neutral element of multiplication in the expectation semiring. Which yields the following algorithm:
 
 \begin{algorithm}
@@ -133,63 +135,142 @@ We raise this into the expectation semiring by replacing the $\oplus$ and $\otim
     $\beta(\textbf{w}, t_0) = \pair{1}{0}$\\
     \For{$i = 1$ \KwTo $N$}{
         $w = exp(score(t_{i-1}, t_i, \textbf{w}))$\\
-        $\beta(\textbf{w}, t_i) = \oplus_{t_i \in T} \pair{w}{-w \cdot logw}\otimes \beta(\textbf{w}, t_{i-1})$
+        $\beta(\textbf{w}, t_i) = \oplus_{t_{i-1} \in T} \pair{w}{-w \cdot logw}\otimes \beta(\textbf{w}, t_{i-1})$
     }
 \end{algorithm}
 We want to prove that the result of the forward algorithm lifted in the expectation semiring computes the unnormalized Entropy defined as:
 \begin{align}
-    H_u(T_\textbf{w}) &= -\sum_{t \in T^N} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})\\
+    H_u(T_\textbf{w}) &= -\sum_{t \in T^N} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})\\
 \end{align}
+The lifted forward algorithm is then equal to:
+\begin{align}
+    \bigoplus_{t_{1:N} \in T^N} \bigotimes_{n=1}^N \pair{w}{-w \cdot \log(w)}
+\end{align}
+
 
 We prove the statement by induction on the length of the sequence $N$. The base case is trivial, since the forward algorithm only computes the score of the first token:
 \begin{align}
-    \beta(\textbf{w}, t_1) &= \oplus_{t_1 \in T} \pair{w}{-w \cdot logw} \otimes \pair{1}{0}\\
-    (\text{def. }\otimes) &= \oplus_{t_1 \in T} \pair{w}{-w \cdot logw} \\
-    (\text{def. }w) &= \oplus_{t_1 \in T}\pair{exp(score(t_{0}, t_1, \textbf{w}))}{-exp(score(t_{0}, t_1, \textbf{w})) \cdot score(t_{0}, t_1, \textbf{w})}\\
-    (\text{def. }\oplus)&= \pair{\sum_{t \in T^1}exp(score(t_{0}, t_1, \textbf{w}))}{-\sum_{t \in T^1} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})}
+    &\bigoplus_{t_{1:1} \in T^1} \bigotimes_{n=1}^1 \pair{w}{-w \cdot \log(w)}\\
+    =  &\bigoplus_{t_1 \in T} \pair{w}{-w \cdot \log(w)}\\
+   (\text{def. w}) = &\bigoplus_{t_1 \in T} \pair{\exp(score(t_0, t_1, \textbf{w}))}{-\exp(score(t_0, t_1, \textbf{w})) \cdot score(t_0, t_1, \textbf{w})}\\
+    = &\bigoplus_{t \in T} \pair{\exp(score_\theta(t, \textbf{w}))}{-exp(score_\theta(t, \textbf{w})) \cdot score_\theta(t, \textbf{w})}\\
+    (\text{def. }\oplus) = &\pair{\sum_{t \in T^1} \exp(score_\theta(t, \textbf{w}))}{- \sum_{t \in T^1} exp(score_\theta(t, \textbf{w})) \cdot score_\theta(t, \textbf{w})}
 \end{align}
 Our induction hypothesis is that the forward algorithm computes the unnormalized entropy for sequences of length $i$:
-\begin{align}
-    \beta(\textbf{w}, t_i) = \pair{\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})}
-\end{align}
+\begin{align*}
+    \bigoplus_{t_{1:i} \in T^i} \bigotimes_{n=1}^i \pair{w}{-w \cdot \log(w)} = \pair{\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})}
+\end{align*}
 Induction step ($i \rightarrow i+1$):
-\begin{align}
-    \beta(\textbf{w}, t_{i+1}) = &\oplus_{t_{i+1} \in T} \pair{w}{-w \cdot logw} \otimes \beta(\textbf{w}, t_i)\\
-    = &\oplus_{t_{i+1} \in T} \pair{w}{-w \cdot logw} \otimes \\ 
-    &\pair{\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})} \quad (\text{IH})\\
-    = &\langle  \sum_{t_{i+1}\in T}\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))  , \label{eq:p1}\\ 
-    &\sum_{t_{i+1}\in T} w \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})) \label{eq:p2}\\
-    -&\sum_{t_{i+1}\in T} w \cdot log(w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))) \rangle \label{eq:p3}\\
-    (\ref{eq:p1}) \Rightarrow &\sum_{t_{i+1}\in T} w \cdot \sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))\\
-    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot \sum_{t \in T^i} exp(score_\Theta(t,\textbf{w}))\\
-    = &\sum_{t \in T^i} \sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1} \textbf{w}))\\
-    = &\sum_{t \in T^{i+1}} exp(score_\Theta(t,\textbf{w})) \label{eq:p1r}\\
-    (\ref{eq:p2}) \Rightarrow & \sum_{t_{i+1}\in T} w \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w}))\\
-    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, \textbf{w})) \cdot (-\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w}))\\
-    = &-\sum_{t \in T^i}\sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score_\Theta(t,\textbf{w}) \label{eq:p2r}\\
-    (\ref{eq:p3}) \Rightarrow &\sum_{t_{i+1}\in T} w \cdot log(w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})))\\
-    (\text{def. }w)= &\sum_{t_{i+1}\in T} exp(score(t_{i}, t_{i+1}, w)) \cdot score(t_{i}, t_{i+1},w) \cdot (\sum_{t \in T^i} exp(score_\Theta(t,\textbf{w})))\\
-    = &\sum_{t \in T^i} \sum_{t_{i+1}\in T} exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score(t_{i}, t_{i+1}, \textbf{w}) \label{eq:p3r}
+\begin{align} 
+    &\bigoplus_{t_{1:i+1} \in T^{i+1}} \bigotimes_{n=1}^{i+1} \pair{w}{-w \cdot \log(w)}\\
+    = &\bigoplus_{t_{i+1} \in T} \left( \bigoplus_{t_{1:i} \in T^{i}} \bigotimes_{n=1}^{i} \pair{w}{-w \cdot \log(w)} \right) \otimes \pair{w}{-w\log(w)} \\
+   \text{(def. IH)} = &\bigoplus_{t_{i+1} \in T} \pair{\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})} \\ 
+   &\otimes \pair{w}{-w\log(w)} \\
+   \text{(def. w)} = &\bigoplus_{t_{i+1} \in T} \pair{\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})} \\ 
+   &\otimes \pair{\exp(score(t_i, t_{i+1}, \textbf{w}))}{-\exp(score(t_i, t_{i+1}, \textbf{w}))\cdot score(t_i, t_{i+1}, \textbf{w})}
+   \label{eq:base}\\
+   &\left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w}))\label{eq:pull_in}\\
+   = & \sum_{t \in T^i} exp(score_\theta(t,\textbf{w}) + score(t_i, t_{i+1}, \textbf{w})) 
 \end{align}
-
+Further we also have:
 \begin{align}
-    (\ref{eq:p2r} - \ref{eq:p3r}) \Rightarrow -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score_\Theta(t,\textbf{w})\\
-    -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot score(t_{i}, t_{i+1}, \textbf{w})\\
-    = -\sum_{t \in T^i} \sum_{t_{i+1}\in T} &exp(score_\Theta(t,\textbf{w}) + score(t_{i}, t_{i+1}, \textbf{w})) \cdot (score_\Theta(t,\textbf{w}) \cdot score(t_{i}, t_{i+1}, \textbf{w})) \\
-    = -\sum_{t \in T^{i+1}} &exp(score_\Theta(t,\textbf{w})) \cdot (score_\Theta(t,\textbf{w})) \label{eq:p3and4}
+    &\left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot (-\exp(score(t_i, t_{i+1}, \textbf{w}))\cdot score(t_i, t_{i+1}, \textbf{w}))\\ 
+    + &\left( -\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})  \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w}))\\
+    = -&\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w}))\cdot score(t_i, t_{i+1}, \textbf{w})\\
+    - &\sum_{t \in T^i} exp(score_\theta(t,\textbf{w}) + score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w})\\
+    = -&\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \cdot score(t_i, t_{i+1}, \textbf{w}) \label{eq:pull_out}
 \end{align}
-Together (\ref{eq:p1r}) and (\ref{eq:p3and4}), we have:
+Using the equalities from \eqref{eq:pull_in} to \eqref{eq:pull_in} we can rewrite the induction step as:
 \begin{align}
-    \langle \sum_{t \in T^{i+1}} exp(score_\Theta(t,\textbf{w})) , \sum_{t \in T^{i+1}} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w}) \rangle
+    \ref{eq:base} \Rightarrow \bigoplus_{t_{i+1} \in T}
+    &\biggl< \left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w})), \\ 
+        &\left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot (-\exp(score(t_i, t_{i+1}, \textbf{w}))\cdot score(t_i, t_{i+1}, \textbf{w}))\\
+        + &\left( -\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})  \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w})) \biggr> \\
+    (\text{with }\ref{eq:pull_out}) = &\bigoplus_{t_{i+1} \in T}
+    \biggl< \left( \sum_{t \in T^i} exp(score_\theta(t,\textbf{w})) \right) \cdot \exp(score(t_i, t_{i+1}, \textbf{w})), \\ 
+    &-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \cdot score(t_i, t_{i+1}, \textbf{w}) \biggr>\\
+    (\text{with }\ref{eq:pull_in}) = &\bigoplus_{t_{i+1} \in T}
+    \biggl< \sum_{t \in T^i} exp(score_\theta(t,\textbf{w}) + score(t_i, t_{i+1}, \textbf{w})) , \\ 
+    &-\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \cdot score(t_i, t_{i+1}, \textbf{w})
+    \biggr>\\
+    (\text{def. }\oplus) = &\biggl<\sum_{t_{i+1} \in T} \sum_{t \in T^i} exp(score_\theta(t,\textbf{w}) + score(t_i, t_{i+1}, \textbf{w})) , \\ 
+    &-\sum_{t_{i+1} \in T}\sum_{t \in T^i} exp(score_\theta(t,\textbf{w})+ score(t_i, t_{i+1}, \textbf{w})) \cdot score_\theta(t,\textbf{w}) \cdot score(t_i, t_{i+1}, \textbf{w})
+    \biggr>\\
+     = &\biggl<\sum_{t \in T^{i+1}} exp(score_\theta(t,\textbf{w})), -\sum_{t \in T^{i+1}} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})\biggr>
 \end{align}
-Concluding the proof.
-From this we can follow that
-\begin{align}
-    \beta(w, t_{N}) = \pair{\sum_{t \in T^N} exp(score_\Theta(t,\textbf{w}))}{-\sum_{t \in T^N} exp(score_\Theta(t,\textbf{w})) \cdot score_\Theta(t,\textbf{w})}
-\end{align}
-Which shows that the second part of the pair is equal to the unnormalized entropy. 
+Concluding the induction.\\
+From this, we can follow that:
+\begin{align*}
+    \bigoplus_{t_{1:N} \in T^N} \bigotimes_{n=1}^N \pair{w}{-w \cdot \log(w)} = \pair{\sum_{t \in T^N} exp(score_\theta(t,\textbf{w}))}{-\sum_{t \in T^N} exp(score_\theta(t,\textbf{w})) \cdot score_\theta(t,\textbf{w})}
+\end{align*}
+This shows that the second part of the pair is equal to the unnormalized entropy. 
 \subsection*{c)}
+To prove:
+\begin{align}
+    H(T_w) \stackrel{!}{=} Z(w)^{-1}H_{U}(T_w)+\log Z(w)
+\end{align}
+\begin{align}
+    H(T_w) &= - \sum_{t\in T^N}p(t|w) \cdot \log p(t|w) &&(\text{def. } H)\\
+    &= - \sum_{t\in T^N}\frac{exp(score_\theta(t,w))}{Z(w)} \cdot \log(\frac{exp(score_\theta(t,w))}{Z(w)}) &&(\text{def. } p)\\
+    &= - \sum_{t\in T^N}\frac{exp(score_\theta(t,w))}{Z(w)} \cdot (score_\theta(t,w) - \log(Z(w))) \\
+    &= - \sum_{t\in T^N}\frac{exp(score_\theta(t,w))\cdot (score_\theta(t,w) - \log(Z(w)))}{Z(w)}\\
+    &= \sum_{t\in T^N}\frac{exp(score_\theta(t,w))\cdot (-score_\theta(t,w) + \log(Z(w)))}{Z(w)}\\    
+    &=\sum_{t\in T^N}\frac{exp(score_\theta(t,w))\cdot \log(Z(w))}{Z(w)} \\
+    &- \sum_{t\in T^N}\frac{exp(score_\theta(t,w))\cdot score_\theta(t,w)}{Z(w)}
+\end{align}
+\begin{align}
+    &= \sum_{t\in T^N}\frac{exp(score_\theta(t,w))\cdot \log(Z(w))}{Z(w)} \\
+    &- \sum_{t\in T^N}(exp(score_\theta(t,w))\cdot score_\theta(t,w)) \cdot Z(w)^{-1}\\
+    &= H_U(T_w) \cdot Z(w)^{-1} + \sum_{t\in T^N}\frac{exp(score_\theta(t,w))\cdot \log(Z(w))}{Z(w)} &&(\text{def. } H_U)\\
+    &= H_U(T_w) \cdot Z(w)^{-1} + \frac{\log(Z(w))}{Z(w)} \cdot \sum_{t\in T^N}exp(score_\theta(t,w))\\
+    &= H_U(T_w) \cdot Z(w)^{-1} + \frac{\log(Z(w))}{Z(w)} \cdot Z(w) &&(\text{def. } Z(w))\\
+    &=  Z(w)^{-1}H_{U}(T_w)+\log Z(w)
+\end{align}
 
+\section*{Question 2: Decoding a CRF with Dijkstra's Algorithm}
+\subsection*{a)}
+We want to prove the following statement: "The score for the first complete tagging, popped from the priority queue is the score for the best part-of-speech tagging under the CRF."
+
+\subsubsection*{Prove via induction:}
+
+Our induction hypothesis is that the first tagging of length $i$ that is popped will always be the best part-of-speech tagging of that length under the CRF.
+
+\subsubsection*{Base case $i=1$:}
+
+This base case follows trivially. All possible taggings of length one are pushed on the priority queue when $\langle \langle 0, BOT \rangle, \mathbbm{1} \rangle$ is first popped. This means the first element in the priority queue will be the best part-of-speech tagging of length 1, which will be popped in the next step.
+
+\subsubsection*{Induction step $i \rightarrow i+1$:}
+
+For this case, we make a case distinction. If the best part-of-speech tagging of length $i+1$ is the extension of the best part-of-speech tagging of length $i$ by one tag the correctness of the IH follows in the same way as in the base case.
+Otherwise, we use the insight that for any $x$ we have $x \leq x+y$ for any $y$ as both have to be in $\mathcal{R}_{\leq 0}$.
+Now let $T_{1:i+1}$ be the best part-of-speech tagging of length $i+1$ with the previous insight it has to follow that the score for every tagging $T_{1:k}, k \leq i+1$ is better than all other possible taggings of length $i+1$. Further at least $\langle \langle 1. t_1 \rangle, s \rangle$ has to have been pushed to the queue. From this, follows that no tagging of length $i+1$ will be popped until $\langle \langle i+1. t_{i+1} \rangle, s \rangle$ has been pushed. From here the next tagging of length $i+1$ to be popped will be the tagging $T_{1:i+1}$ as it is per our assumption the best part-of-speech tagging of length $i+1$.
+
+Thus our IH holds for all $i$ from which we can follow the statement by setting $i = N$.
+
+\subsection*{b)}
+Assuming we run Viterbi in a forward manner (not as presented in the lecture as then the entries would be different).
+
+\subsubsection*{i)}
+We first prove that the shape of the computed $\gamma$ is the same.
+Let $N$ be the length of $w$
+In Viterbi, we compute for each length $i \in [1,...,N] $ one entry per tag. This gives a $\gamma \in \mathcal{R}^{N \times |T|}$
+The $\gamma$ induced by Dijkstra has the same shape (neglecting the initial entry for $\langle 0, BOT\rangle$).
+This is very easy to see in Dijkstra we push each $\langle i, t\rangle$ pair is popped exactly once. This holds as we only push a pair if it has not yet been popped and if the pair is already queued and it is pushed again only the one with the higher score will remain in the queue.
+Further, each pair is pushed at least once as the algorithm, for each pair $\langle i, t\rangle$, pushes all unpopped pairs $\langle i+1, t'\rangle, t' \in T$.
+Thus once the algorithm finishes we will have an entry in $\gamma$ for all pairs $\langle i, t\rangle$ with $i \in [1,...,N], t \in T$ and one additional entry for $\langle 0, BOT\rangle$ which we can ignore.
+This gives us the same shape of $\gamma$ as Viterbi's algorithm.
+
+\subsubsection*{ii)}
+Now we prove that the entries of $\gamma$ induced by Viterbi's and Dijkstra's algorithms are the same.
+Both algorithms will save the score of the best part of part-of-speech tagging of length $i$ ending with tag $t$ at $\langle i, t\rangle$.
+The prove is for Viterbi's algorithm is simple we assume that $\gamma[i,t']$ corresponding to a tagging $T'_{1:i}$ is not the best part-of-speech tagging of length $i$ ending with tag $t$. Then there has to be a better part-of-speech tagging $T_{1:i}$  where $t_i = t'$. Now let j be the last index where $T'$ and $T$ differ this means that all tags after the j-th are the same. From this also follows that the score of the tagging $T_{1:j+1}$ has to be better than the score of $T'_{1:j+1}$ as the tags from this point are the same and $T$ scores higher. But then in the step where $\gamma[j+1, t_{j+1}]$ is assigned the algorithm would have chosen $T_{1:j}$ over $T'_{1:j}$ as we take the max overall best entries of length $j-1$. Thus $\gamma[i,t']$ has to be the score corresponding to the best part-of-speech tagging of length $i$ ending with tag $t$.
+
+Resulting in a contradiction and proving that the entries of $\gamma$ are the best part of part-of-speech tagging of length $i$ ending with tag $t$ at $\langle i, t\rangle$.
+
+Assume that $\gamma[i,t]$ corresponding to the tagging $T_{1:i}$ is not the score of the best part-of-speech tagging of length $i$ ending with tag $t$. From this follows that the first popped pair for $\langle i, t\rangle$ was not the best part-of-speech tagging of length $i$ ending with tag $t$. Let $T'_{1:i}$ be the best part-of-speech tagging of length $i$ ending with tag $t$.
+Then as we argued in a) the scores of all $T'_{1:j}; \forall j , 1 \leq j \leq i$ have to be greater than the score of $T'_{1:i}$ this means that $\langle i, t\rangle$ would not be popped before all of $\langle j, t_j\rangle, j \in [1,...,i]$ have been popped this means that $\gamma[i,t]$ would be set to the score of the tagging $T'$ and not $T$.
+
+Resulting in a contradiction and proving that the entries of $\gamma$ are the best part of part-of-speech tagging of length $i$ ending with tag $t$ at $\langle i, t\rangle$ and that the entries of $\gamma$ induced by Viterbi's and Dijkstra's algorithms are the same.
 \end{document}
 
 %%% Local Variables:
