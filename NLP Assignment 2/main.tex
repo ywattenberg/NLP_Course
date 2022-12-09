@@ -226,6 +226,7 @@ To prove:
     &= H_U(T_w) \cdot Z(w)^{-1} + \frac{\log(Z(w))}{Z(w)} \cdot Z(w) &&(\text{def. } Z(w))\\
     &=  Z(w)^{-1}H_{U}(T_w)+\log Z(w)
 \end{align}
+\subsection*{d)}
 
 \section*{Question 2: Decoding a CRF with Dijkstra's Algorithm}
 \subsection*{a)}
@@ -237,13 +238,13 @@ Our induction hypothesis is that the first tagging of length $i$ that is popped 
 
 \subsubsection*{Base case $i=1$:}
 
-This base case follows trivially. All possible taggings of length one are pushed on the priority queue when $\langle \langle 0, BOT \rangle, \mathbbm{1} \rangle$ is first popped. This means the first element in the priority queue will be the best part-of-speech tagging of length 1, which will be popped in the next step.
+The base case follows trivially. All possible taggings of length one are pushed on the priority queue when $\langle \langle 0, BOT \rangle, \mathbbm{1} \rangle$ is first popped. This means the first element in the priority queue will be the best part-of-speech tagging of length 1, which will be popped in the next step.
 
 \subsubsection*{Induction step $i \rightarrow i+1$:}
 
 For this case, we make a case distinction. If the best part-of-speech tagging of length $i+1$ is the extension of the best part-of-speech tagging of length $i$ by one tag the correctness of the IH follows in the same way as in the base case.
-Otherwise, we use the insight that for any $x$ we have $x \leq x+y$ for any $y$ as both have to be in $\mathcal{R}_{\leq 0}$.
-Now let $T_{1:i+1}$ be the best part-of-speech tagging of length $i+1$ with the previous insight it has to follow that the score for every tagging $T_{1:k}, k \leq i+1$ is better than all other possible taggings of length $i+1$. Further at least $\langle \langle 1. t_1 \rangle, s \rangle$ has to have been pushed to the queue. From this, follows that no tagging of length $i+1$ will be popped until $\langle \langle i+1. t_{i+1} \rangle, s \rangle$ has been pushed. From here the next tagging of length $i+1$ to be popped will be the tagging $T_{1:i+1}$ as it is per our assumption the best part-of-speech tagging of length $i+1$.
+Otherwise, we use the insight that for any $x$ we have $x \geq x+y$ for any $y$ as both have to be in $\mathcal{R}_{\leq 0}$.
+Now let $T_{1:i+1}$ be the best part-of-speech tagging of length $i+1$ with the previous insight it has to follow that the score for every tagging $T_{1:k}, k \leq i+1$ is better than all other possible taggings of length $i+1$. Further at least $\langle \langle 1, t_1 \rangle, s \rangle$ has to have been pushed to the queue. From this, follows that no tagging of length $i+1$ will be popped until $\langle \langle i+1, t_{i+1} \rangle, s \rangle$ has been pushed. From here the next tagging of length $i+1$ to be popped will be the tagging $T_{1:i+1}$ as it is per our assumption the best part-of-speech tagging of length $i+1$.
 
 Thus our IH holds for all $i$ from which we can follow the statement by setting $i = N$.
 
@@ -253,17 +254,18 @@ Assuming we run Viterbi in a forward manner (not as presented in the lecture as 
 \subsubsection*{i)}
 We first prove that the shape of the computed $\gamma$ is the same.
 Let $N$ be the length of $w$
-In Viterbi, we compute for each length $i \in [1,...,N] $ one entry per tag. This gives a $\gamma \in \mathcal{R}^{N \times |T|}$
+In Viterbi, we compute for each length $i \in [1,...,N] $ one entry per tag. This gives a $\gamma \in \mathcal{R}^{N \times |\mathcal{T}|}$
 The $\gamma$ induced by Dijkstra has the same shape (neglecting the initial entry for $\langle 0, BOT\rangle$).
 This is very easy to see in Dijkstra we push each $\langle i, t\rangle$ pair is popped exactly once. This holds as we only push a pair if it has not yet been popped and if the pair is already queued and it is pushed again only the one with the higher score will remain in the queue.
 Further, each pair is pushed at least once as the algorithm, for each pair $\langle i, t\rangle$, pushes all unpopped pairs $\langle i+1, t'\rangle, t' \in T$.
-Thus once the algorithm finishes we will have an entry in $\gamma$ for all pairs $\langle i, t\rangle$ with $i \in [1,...,N], t \in T$ and one additional entry for $\langle 0, BOT\rangle$ which we can ignore.
+Thus once the algorithm finishes we will have an entry in $\gamma$ for all pairs $\langle i, t\rangle$ with $i \in [1,...,N], t \in \mathcal{T}$ and one additional entry for $\langle 0, BOT\rangle$ which we can ignore.
 This gives us the same shape of $\gamma$ as Viterbi's algorithm.
 
 \subsubsection*{ii)}
 Now we prove that the entries of $\gamma$ induced by Viterbi's and Dijkstra's algorithms are the same.
 Both algorithms will save the score of the best part of part-of-speech tagging of length $i$ ending with tag $t$ at $\langle i, t\rangle$.
-The prove is for Viterbi's algorithm is simple we assume that $\gamma[i,t']$ corresponding to a tagging $T'_{1:i}$ is not the best part-of-speech tagging of length $i$ ending with tag $t$. Then there has to be a better part-of-speech tagging $T_{1:i}$  where $t_i = t'$. Now let j be the last index where $T'$ and $T$ differ this means that all tags after the j-th are the same. From this also follows that the score of the tagging $T_{1:j+1}$ has to be better than the score of $T'_{1:j+1}$ as the tags from this point are the same and $T$ scores higher. But then in the step where $\gamma[j+1, t_{j+1}]$ is assigned the algorithm would have chosen $T_{1:j}$ over $T'_{1:j}$ as we take the max overall best entries of length $j-1$. Thus $\gamma[i,t']$ has to be the score corresponding to the best part-of-speech tagging of length $i$ ending with tag $t$.
+
+The proof for Viterbi's algorithm is simple we assume that $\gamma[i,t']$ corresponding to a tagging $T'_{1:i}$ is not the best part-of-speech tagging of length $i$ ending with tag $t$. Then there has to be a better part-of-speech tagging $T_{1:i}$  where $t_i = t'$. Now let j be the last index where $T'$ and $T$ differ this means that all tags after the j-th are the same. From this also follows that the score of the tagging $T_{1:j+1}$ has to be better than the score of $T'_{1:j+1}$ as the tags from this point are the same and $T$ scores higher. But then in the step where $\gamma[j+1, t_{j+1}]$ is assigned the algorithm would have chosen $T_{1:j}$ over $T'_{1:j}$ as we take the max overall best entries of length $j-1$. Thus $\gamma[i,t']$ has to be the score corresponding to the best part-of-speech tagging of length $i$ ending with tag $t$. Viterbi's algorithm bases entries for length $i+1$ of $\gamma$ on the entries for length $i$. 
 
 Resulting in a contradiction and proving that the entries of $\gamma$ are the best part of part-of-speech tagging of length $i$ ending with tag $t$ at $\langle i, t\rangle$.
 
@@ -271,6 +273,13 @@ Assume that $\gamma[i,t]$ corresponding to the tagging $T_{1:i}$ is not the scor
 Then as we argued in a) the scores of all $T'_{1:j}; \forall j , 1 \leq j \leq i$ have to be greater than the score of $T'_{1:i}$ this means that $\langle i, t\rangle$ would not be popped before all of $\langle j, t_j\rangle, j \in [1,...,i]$ have been popped this means that $\gamma[i,t]$ would be set to the score of the tagging $T'$ and not $T$.
 
 Resulting in a contradiction and proving that the entries of $\gamma$ are the best part of part-of-speech tagging of length $i$ ending with tag $t$ at $\langle i, t\rangle$ and that the entries of $\gamma$ induced by Viterbi's and Dijkstra's algorithms are the same.
+
+\subsection*{c)}
+Assuming a realistic priority queue implementation based on binary heaps. We have a total worst-case runtime of $\mathcal{O}(|\mathcal{T}|^2 \cdot |W| + (|\mathcal{T}| \cdot |W|) \cdot \log (|\mathcal{T}| \cdot |W|))$. As we have $|\mathcal{T}|$ edges for every vertex and $|\mathcal{T}| \cdot |W|$ vertices as we have a vertex for every tag for every word. 
+Viterbi's algorithm has a runtime of $\mathcal{O}(|\mathcal{T}|^2 \cdot |W|)$ as we go for every word over every tag and over every previous tag. This means that in theory if $\log(|\mathcal{T}| \cdot |W|) < |\mathcal{T}|$ then it can make sense to use Dijkstra's algorithm however in reality this is very unlikely as Dijkstra also incurs more overhead due to more complicated data structures. Dijkstra can stop early and thus can be faster to calculate the best part-of-speech tagging using Dijkstra's algorithm compared to Viterbi.
+
+\subsection*{d)}
+
 \end{document}
 
 %%% Local Variables:
