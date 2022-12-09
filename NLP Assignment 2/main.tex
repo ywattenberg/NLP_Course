@@ -227,6 +227,16 @@ To prove:
     &=  Z(w)^{-1}H_{U}(T_w)+\log Z(w)
 \end{align}
 
+\subsection*{d)} 
+We want to prove that $H(T_w)$ can be calculated in $O(|T|^2 \cdot N)$ time.\\
+
+From c), we can see that $H(T_w)$  is equal to $Z(w)^{-1}H_{U}(T_w)+\log Z(w)$.
+We can calculate $Z(w)$ in $O(|T|^2 \cdot N)$ time, since we have seen in the lecture that we can calculate the partition function in $O(|T|^2 \cdot N)$ time by using the forward/backward algorithm. Thus $\log Z(w)$ can also be calculated in $O(|T|^2 \cdot N)$ time.
+All that remains is to calculate $H_{U}(T_w)$, which can be done in $O(|T|^2 \cdot N)$ time, since we have shown in b) that the unnormalized entropy can be calculated in $O(|T|^2 \cdot N)$ time. This can be done by using the forward/backward algorithm over the expectaion semiring by lifting the arc weights to $\pair{w}{-w \cdot \log (w)}$.
+The total time complexity is thus $O(|T|^2 \cdot N)$.
+
+Further the derivative can be calculate in the same time complexity, since we have seen in the lecture that the derivative of a function can be calculated in the same time complexity as the function itself. Using a forward pass and a backward pass, we can calculate the derivative of $H(T_w)$ in $O(|T|^2 \cdot N)$ time.
+
 \section*{Question 2: Decoding a CRF with Dijkstra's Algorithm}
 \subsection*{a)}
 We want to prove the following statement: "The score for the first complete tagging, popped from the priority queue is the score for the best part-of-speech tagging under the CRF."
