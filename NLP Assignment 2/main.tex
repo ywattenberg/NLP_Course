@@ -226,9 +226,8 @@ To prove:
     &= H_U(T_w) \cdot Z(w)^{-1} + \frac{\log(Z(w))}{Z(w)} \cdot Z(w) &&(\text{def. } Z(w))\\
     &=  Z(w)^{-1}H_{U}(T_w)+\log Z(w)
 \end{align}
-\subsection*{d)}
 
-\subsection*{d)} 
+\subsection*{d)}
 We want to prove that $H(T_w)$ can be calculated in $O(|T|^2 \cdot N)$ time.\\
 
 From c), we can see that $H(T_w)$  is equal to $Z(w)^{-1}H_{U}(T_w)+\log Z(w)$.
@@ -289,6 +288,14 @@ Assuming a realistic priority queue implementation based on binary heaps. We hav
 Viterbi's algorithm has a runtime of $\mathcal{O}(|\mathcal{T}|^2 \cdot |W|)$ as we go for every word over every tag and over every previous tag. This means that in theory if $\log(|\mathcal{T}| \cdot |W|) < |\mathcal{T}|$ then it can make sense to use Dijkstra's algorithm however in reality this is very unlikely as Dijkstra also incurs more overhead due to more complicated data structures. Dijkstra can stop early and thus can be faster to calculate the best part-of-speech tagging using Dijkstra's algorithm compared to Viterbi.
 
 \subsection*{d)}
+When we change $\oplus := \max$ to $\oplus := \oplus_{\log}$ as defined on the exercise sheet Dijkstra's algorithm does not correctly calculate the part-of-speech tagging.
+It would fail for example at the point where Dijkstra's algorithm pushes a tag that is already in the priority queue. The algorithm fails at that point because there the old value of the old tagging, index pair still affects the position of the tag in the queue. For example let $T_{1:N}$ be the best part-of-speech tagging it might be the case that while $score(T_{i-1}, T_{i}, w)$ is high $score(t', T_{i}, w)$ for some $t' \neq T_{i-1}$ is terrible. It can still be the case that Dijkstra pops $\pair{i-1}{t'}$ first then the score on the priority queue of $\pair{i}{T_{i}}$ will be bad and it will not be correctly popped.
+
+\subsection*{e)}
+A class of semirings on which we can correctly run Dijkstra's algorithm needs to full fill/have the characteristics which we used in a) to prove that Dijkstra's algorithm works. That Dijkstra's algorithm works on the class of semirings which full fill the constraints that for all $x,y$ in the semiring we have $x \geq x \otimes y$ and that $\oplus$ is the max-function or the reverse i.e. $x \leq x \otimes y$ for all $x,y$ and that $\oplus$ is the min-function for these we also need to negate all scores such that minimal score is the best one.
+
+\section*{Practical part}
+My notebook can be found \href{https://colab.research.google.com/drive/12TscdKKPl-O5Xpp4rBXUnRU3w9f-TZPL?usp=sharing}{here}. I will also include the downloaded file in my submission.
 
 \end{document}
 
