@@ -1,0 +1,99 @@
+\documentclass[a4paper,12pt]{ETHexercise}
+\usepackage{bbm}
+
+\input{preamble}
+
+\usepackage{multirow}
+\title{NLP Assignment}
+\begin{document}
+\setserie{1}
+
+
+
+\lectureheader{Prof. Ryan Cotterell}
+{}
+{\Large Natural Language Processing}{Fall 2022}
+\begin{center}
+    {\Huge Yannick Wattenberg: Assignment 03}\\
+      \quad\newline
+      ywattenberg@inf.ethz.ch, 19-947-464.\\
+      \quad\newline
+    \timestamp
+
+\end{center}
+\section*{Question 1: Exploring the Kleene Star}
+\subsection*{a)}
+To prove: 
+\begin{align*}
+    a^* &\stackrel{!}{=} 1 \oplus a \otimes a^* \\
+\end{align*}
+\begin{align}
+    a^* &= \bigoplus^{\infty}_{n=0}a^{\otimes n} &&(\text{def.} *)\\
+    &= 1 \oplus \bigoplus^{\infty}_{n=1}a^{\otimes n}  &&(\text{def.} \oplus)\\
+    &= 1 \oplus a \otimes \bigoplus^{\infty}_{n=0}a^{\otimes n}  &&(\text{diss. of } \otimes \text{over } \oplus)\\
+\end{align}
+
+\subsection*{b)}
+We want to find a Kleene Star for $\mathcal{W}_{log}$. Using the definition of Kleene Star, we have:
+\begin{align}
+    a^* &= \bigoplus^{\infty}_{n=0}a^{\otimes n} &&(\text{def.} *)\\
+     &= 0 \oplus_{log} a \oplus_{log} a \otimes a \oplus_{log} \dots\\
+     &= \ln(\exp(0) + \exp(a)) \oplus_{log} a + a \oplus_{log} \dots &&(\text{def.} \oplus, \otimes)\\
+     &= \ln(\exp(\ln(\exp(0) + \exp(a))) + exp(2a)) \oplus_{log} \dots \\
+     &= \ln(\exp(0) + \exp(a)+ \exp(2a)) \oplus_{log} \dots \\
+     &= \ln(\sum^\infty_{n=0} \exp(a \cdot n))\\
+\end{align}
+For $a \geq 0$ this series will diverge as $n \to \infty $, because $\lim_{n \to \inf} \exp(a\cdot n) \geq 1$ in that case.
+
+Thus we assume that $a < 0$ for the rest of the proof. We can then rewrite the series as a geometric series as follows: 
+\begin{align}
+    \sum^\infty_{n=0} \exp(a \cdot n) &= \sum^\infty_{n=0} g^n &&(\text{where } g = \exp(a))\\
+    &= \frac{1}{1-g} &&(\text{limit of the geometric series})\\
+    &= \frac{1}{1-\exp(a)} &&(\text{def.} g)  
+\end{align}
+For the Kleene Star expression we then get:
+\begin{align*}
+    a^* &= \ln \left( \frac{1}{1-\exp(a)} \right)
+\end{align*}
+\subsection*{c)}
+We want to find a Kleene Star for the expectation semiring. Following the same pattern as in the previous part, the definition gives us:
+
+\begin{align}
+    \text{let} a &= \pair{x}{y} \in \mathcal{R} \times \mathcal{R} \\
+    a^* &= \bigoplus^{\infty}_{n=0}a^{\otimes n}\\
+    &= \bigoplus^{\infty}_{n=0}\pair{x}{y}^{\otimes n}\\
+    &= \pair{1}{0} \oplus \pair{x}{y} \oplus \pair{x^2}{2xy} \oplus \pair{x^3}{3x^2y} \oplus \dots\\
+    &= \bigoplus^{\infty}_{n=0}\pair{x^n}{nx^{n-1}y}\\
+    &= \pair{\sum^{\infty}_{n=0} x^n}{\sum^{\infty}_{n=0} nx^{n-1}y}
+\end{align}
+We can now explore the limit of both of the series individually. For the first one we have:
+\begin{align}
+    \sum^{\infty}_{n=0} x^n &= \frac{1}{1-x} &&(\text{limit of the geometric series})\\
+\end{align}
+Assuming that $|x| < 1$, as otherwise the series would diverge. For the second one we have:
+\begin{align}
+    \sum^{\infty}_{n=0} nx^{n-1}y  
+    &= y \cdot (\sum^{\infty}_{n=0} nx^{n-1}) \\
+    &= y \cdot (\sum^{\infty}_{n=0} (n+1)x^{n})  \\
+    &= \frac{y}{(x-1)^2} &&(\text{limit of the power series})
+\end{align}
+With the same assumption as before, we can now combine the two limits to get:
+\begin{align*}
+    \pair{x}{y}^* &= \pair{\frac{1}{1-x}}{\frac{y}{(x-1)^2}}
+\end{align*}
+for $|x| < 1$.
+
+\subsection*{d)}
+
+Now we want to find a Kleene Star for $\mathcal{W}_{lang}$. Using the definition of Kleene Star, we have:
+\begin{align}
+    A* &= \bigoplus^{\infty}_{n=0}A^{\otimes n} &&(\text{def.} *)\\
+     &= \epsilon \cup A \cup A \otimes A \cup \dots\\ 
+     &= \epsilon \cup A \cup A \circ A \cup \dots\\ 
+\end{align}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
