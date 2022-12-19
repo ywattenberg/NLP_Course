@@ -91,6 +91,56 @@ Now we want to find a Kleene Star for $\mathcal{W}_{lang}$. Using the definition
      &= \epsilon \cup A \cup A \otimes A \cup \dots\\ 
      &= \epsilon \cup A \cup A \circ A \cup \dots\\ 
 \end{align}
+
+\section*{Question 2: Asterating Matrices in Idempotent Semirings}
+\subsection*{a)}
+For the tropical semiring, let $a \in \mathcal{R}_{\geq 0}$ be an element of the tropical semiring, we get:
+\begin{align}
+    0 \oplus a &= \min(0, a) &&(\text{def.} \oplus)\\
+    &= 0 &&(a \in \mathcal{R}_{\geq 0})\\
+\end{align}
+
+For the artic semiring, let $a \in \mathcal{R}_{\leq 0}$ be an element of the artic semiring, we get:
+\begin{align}
+    0 \oplus a &= \max(0, a) &&(\text{def.} \oplus)\\
+    &= 0 &&(a \in \mathcal{R}_{\leq 0})\\
+\end{align}
+Thus we can conclude that both the tropical and artic semirings are 0-closed.
+
+\subsection*{b)}
+We prove that the $M^n$ encodes the sum of paths of length $n$ in the graph $G$ using induction over $n$.
+For $n = 1$ we have:
+The matrix $M$ encodes the transition matrix of the graph $G$. Thus it encodes all paths of length one.
+
+Our induction hypothesis is that $M^n$ encodes the sum of paths of length $n$ in the graph $G$. We want to show that $M^{n+1}$ encodes the sum of paths of length $n+1$.
+We have $M^{n+1} = M^{n} \otimes M$ as $M^{n}$ encodes the sum of paths of length $n$ and $M$ encodes the sum of paths of length one.
+For some $i, j \in [1,...,N]$ we have:
+\begin{align}
+    (M^{n+1})_{i,k} = \bigoplus_{k=1}^{N} (M^n)_{ik} \otimes M_{kj}
+\end{align}
+Thus as we can see $(M^{n+1})_{i,k}$ encodes the sum of all paths of length $n+1$ from $i$ to $k$ as
+it is the sum of all paths of length $n$ from $i$ to some $k$ concatenated with a path of length one from $k$ to $j$.
+
+\subsection*{c)}
+Assume that there is a shortest path from $i$ to $j$ that traverses more than $N-1$ transitions/edges.
+It follows that at least one vertex has to be visited twice as there are only $N$ vertices.
+We denote the path as follows:
+\begin{align}
+    i \stackrel{w_0}{\rightarrow} \underbrace{... \rightarrow}_{a_1} k \underbrace{\rightarrow ... \rightarrow}_{a_2} k \underbrace{\rightarrow ...}_{a_3} \stackrel{w_k}{\rightarrow} j
+\end{align}
+We can build a path of length $N-1$ from $i$ to $j$ by cutting out the path from $k$ to $k$ in the middle of the path. 
+
+Per definition of the shortest path, we get the following for the two paths:
+\begin{align}
+    &w_0 \otimes a_1 \otimes a_2 \otimes a_3 \otimes w_k \oplus w_0 \otimes a_1 \otimes a_3 \otimes w_k\\
+    = &(w_0 \otimes a_1) \otimes (a_2 \otimes a_3 \otimes w_k \oplus a_3 \otimes w_k)\\
+    = &(w_0 \otimes a_1) \otimes (a_2 \oplus 1) \otimes (\otimes a_3 \otimes w_k)\\
+    = &(w_0 \otimes a_1) \otimes (1) \otimes (\otimes a_3 \otimes w_k) &&(\text{0-closed})\\
+    = &w_0 \otimes a_1 \otimes a_3 \otimes w_k
+\end{align}
+
+\subsection*{d)}
+We can
 \end{document}
 
 %%% Local Variables:
