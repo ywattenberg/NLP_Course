@@ -140,7 +140,56 @@ Per definition of the shortest path, we get the following for the two paths:
 \end{align}
 
 \subsection*{d)}
-We can
+\begin{align}
+    M^* &= \bigoplus^{\infty}_{n=0} M^n &&(\text{def.} *)\\
+    &= \lim_{K \rightarrow \infty} \bigoplus_{n=0}{K} M^n &&(\text{def.} \oplus)\\
+\end{align}
+We we have shown in part b) that $M^n$ encodes the sum of paths of length $n$ in the graph $G$. Furthermore we have shown that the shortest path from $i$ to $j$ has uses at most $N-1$ transitions.
+Now using the definition of the shortest path:
+\begin{align}
+    Z(i,j) &= \bigoplus_{\pi \in \prod(i,j)} w(\pi) \nonumber
+\end{align}
+We get that $\prod(i,j)$ needs only to be over all path of length $N-1$ or less (see task c)). Thus we can rewrite
+the definition as follows:
+\begin{align*}
+    Z(i,j) &= \bigoplus_{n = 1}^{N-1} w((M^n)_{ij})
+\end{align*}
+As we made no further assuming on $i,j$ this holds for all $i,j \in [1,...,N]$.
+We can now rewrite the Kleene start in the same manner as the previous equality holds for all $i,j \in [1,...,N]$:
+\begin{align}
+       \lim_{K \rightarrow \infty} \bigoplus_{n=0}^{K} M^n \\
+    &= \lim_{K \rightarrow N-1} \bigoplus_{n = 1}^{K-1} w((M^n))\\
+    &= \bigoplus_{n = 1}^{N-1} w((M^n))\\
+\end{align}
+
+\subsection*{e)}
+\begin{algorithm}
+    \SetAlgoLined
+    \caption[]{Algorithm for computing $M^*$}
+    \KwIn{Adjacency matrix $M$}
+    \KwOut{$M^*$}
+    $M' \gets M$\\
+    $R  \gets M$\\
+    \For(){$i = 1; i < N; i\gets i+1$}{
+        $R \gets R \oplus M'$\\
+        $M' \gets M' \otimes M$
+    }
+\end{algorithm}
+The algorithm computes $M^*$ using the equality we proved in part d). It simply aggregates the sum of the $M^n$ for $n = 1,...,N-1$ in the variable $R$. The variable $M'$ is used to compute the $M^n$.
+The Runtime of the algorithm is $O(N^3)$ as we need to compute $N$ matrix multiplications of size $N \times N$.
+
+\subsection*{f)}
+We want to prove that every 0-closed semiring is also idempoent.
+\begin{align}
+    a \oplus a\\
+    = &a \otimes (1 \oplus 1)\\
+    = &a \otimes 1\\
+    = &a
+\end{align}
+Thus we have shown that every 0-closed semiring is idempoent.
+
+\subsection*{g)}
+\be
 \end{document}
 
 %%% Local Variables:
