@@ -43,9 +43,9 @@ We want to find a Kleene Star for $\mathcal{W}_{log}$. Using the definition of K
      &= \ln(\exp(0) + \exp(a)+ \exp(2a)) \oplus_{log} \dots \\
      &= \ln(\sum^\infty_{n=0} \exp(a \cdot n))\\
 \end{align}
-For $a \geq 0$ this series will diverge as $n \to \infty $, because $\lim_{n \to \inf} \exp(a\cdot n) \geq 1$ in that case.
+For $a \geq 1$ this series will diverge as $n \to \infty $, because $\lim_{n \to \inf} \exp(a\cdot n) \geq 1$ in that case.
 
-Thus we assume that $a < 0$ for the rest of the proof. We can then rewrite the series as a geometric series as follows: 
+Thus we assume that $a < 1$ for the rest of the proof. We can then rewrite the series as a geometric series as follows: 
 \begin{align}
     \sum^\infty_{n=0} \exp(a \cdot n) &= \sum^\infty_{n=0} g^n &&(\text{where } g = \exp(a))\\
     &= \frac{1}{1-g} &&(\text{limit of the geometric series})\\
@@ -158,8 +158,8 @@ As we made no further assuming on $i,j$ this holds for all $i,j \in [1,...,N]$.
 We can now rewrite the Kleene start in the same manner as the previous equality holds for all $i,j \in [1,...,N]$:
 \begin{align}
        \lim_{K \rightarrow \infty} \bigoplus_{n=0}^{K} M^n \\
-    &= \lim_{K \rightarrow N-1} \bigoplus_{n = 1}^{K-1} w((M^n))\\
-    &= \bigoplus_{n = 1}^{N-1} w((M^n))\\
+    &= \lim_{K \rightarrow N-1} \bigoplus_{n = 0}^{K-1} w((M^n))\\
+    &= \bigoplus_{n = 0}^{N-1} w((M^n))\\
 \end{align}
 
 \subsection*{e)}
@@ -168,7 +168,7 @@ We can now rewrite the Kleene start in the same manner as the previous equality 
     \caption[]{Algorithm for computing $M^*$}
     \KwIn{Adjacency matrix $M$}
     \KwOut{$M^*$}
-    $M' \gets M$\\
+    $M' \gets I$\\
     $R  \gets M$\\
     \For(){$i = 1; i < N; i\gets i+1$}{
         $R \gets R \oplus M'$\\
@@ -189,7 +189,88 @@ We want to prove that every 0-closed semiring is also idempoent.
 Thus we have shown that every 0-closed semiring is idempoent.
 
 \subsection*{g)}
-\be
+We want to prove the following equality:
+\begin{align*}
+    \bigoplus_{n=0}^{K} M^n = (I \oplus M)^K
+\end{align*}
+We do so by induction on $K$.
+The base case $K = 0$ is trivial as $M^0 = I$ thus:
+\begin{align}
+    I = (I \oplus M)^0 = M^0 = \bigoplus_{n=0}^{0} M^n
+\end{align}
+Now we assume that the equality holds for $K$ and want to show that it also holds for $K+1$:
+\begin{align}
+    (I \oplus M)^{K+1} &= (I \oplus M)^K \otimes (I \oplus M) \\
+    &=  \bigoplus_{n=0}^{K} M^n \otimes (I \oplus M) &&(\text{distributive})\\
+    &=  \bigoplus_{n=0}^{K} M^n \oplus M^{n+1} &&(\text{def.} I)\\
+    &=  \bigoplus_{n=0}^{K} M^n \oplus \bigoplus_{n=1}^{K+1} M^{n} \\
+    &=   M^0 \oplus \left(\bigoplus_{n=1}^{K} M^n \oplus M^{n}\right) \oplus M^{K+1} \\
+    &=   M^0 \oplus \left(\bigoplus_{n=1}^{K} M^{n}\right) \oplus M^{K+1}&&(\text{Idempotent}) \\
+    &=  \bigoplus_{n=0}^{K+1} M^n 
+\end{align}
+
+\subsection*{h)}
+It is easy to see that the equation $M^n = \bigotimes^{\log_2n}_{k = 0} M^{\alpha_k 2^k}$ as it all natural numbers can be represented using the binary system.
+More concretely we can write $\bigotimes^{\log_2n}_{k = 0} M^{\alpha_k 2^k}$ as $M^{\sum^{\log_2n}_{k = 0} \alpha_k 2^k}$ as $M^a \otimes M^b = M^{a + b}$. Then  we choose $a_k = 1 $ iff. the k-th bit of the binary representation of n is one and zero otherwise. In other words let a be the binary representation of n. Using this it becomes apparent that $\sum^{\log_2n}_{k = 0} \alpha_k 2^k = n$ as it is the way to convert the binary representation of n ($a$) to a decimal number.
+
+A more efficient way to compute $M^* = \bigoplus^{N-1}_{n=0} M^n$ uses the following equality which holds as the semiring is 0-closed and thus idempoent (f):
+\begin{align}
+    \bigoplus^{N-1}_{n=0} M^n &= (I \oplus M)^{N-1} &&(\text{(g)}) \\
+    (I \oplus M)^{N-1} &= \bigotimes^{\log_2 N-1}_{k = 0} (I \oplus M)^{a_k 2^k} &&(\text{(h)}) \\
+\end{align}
+Where $a_k$ is the k-th bit of the binary representation of $N-1$.
+The algorithm is as follows:
+\begin{algorithm}
+    \SetAlgoLined
+    \caption[]{Faster Algorithm for computing $M^*$}
+    \KwIn{Adjacency matrix $M$}
+    \KwOut{$M^*$}
+    $M' \gets I$\\
+    $R  \gets (I \oplus M)$\\
+    \For(){$i = 0; i < \log_2 (N-1)+1; i\gets i+1$}{
+        \If(){$a_i \text{ is } 1$}{
+            $R \gets R \otimes M'$
+        }
+        $M' \gets M' \otimes M'$
+    }
+\end{algorithm}
+
+\subsection*{i)}
+In the following all norms will refer to the two norm.
+First we rewrite the definition of $\lVert M \rVert$:
+\begin{align}
+    \lVert M \rVert &= sup_{x \neq 0} \frac{\lVert Mx \rVert}{\lVert x \rVert} \\
+    &= sup_{x \neq 0; \lVert x \rVert =1}\lVert Mx \rVert
+\end{align}
+This holds as one can just normalize the vector $x$ to have length 1. 
+
+Now let $U \Sigma V^T$ be the SVD of $M$. Then we have:
+\begin{align}
+    sup_{x \neq 0; \lVert x \rVert =1} \lVert U \Sigma V^T x\rVert\\
+    &= sup_{x' \neq 0; \lVert x' \rVert =1} \lVert \Sigma x'\rVert\\
+    &= \sigma_1
+\end{align}
+The last equality follows from the min-max theorem for singular values. Thus we have shown that $\lVert M \rVert = \sigma_1$.
+
+\subsection*{j)}
+First we reform the initial equation:
+\begin{align}
+    \lVert M^* - \sum_{n=0}^K A^n \rVert &= \lVert \sum_{n=0}^\infty A^n - \sum^{\infty}_{n=0} M^n \rVert\\
+    &= \lVert \sum^{\infty}_{n=K+1} M^n \rVert\\
+    sup_{x \neq 0; \lVert x \rVert =1} \lVert \sum^{\infty}_{n=K+1} M^n x \rVert
+    &\leq \sum^{\infty}_{n=K+1} sup_{x \neq 0; \lVert x \rVert =1} \lVert M^n x \rVert \label{2j1}\\
+    &\leq \sum^{\infty}_{n=K+1} \lVert M \rVert^n &&(\sigma = \sigma_{max}(A)) \label{2j2}\\
+    &= \sum^{\infty}_{n=K+1} \sigma^n \\
+    &= \frac{\sigma^{K+1}}{1-\sigma} \label{2j3}
+\end{align}
+The inequality in \eqref{2j1} holds as the one can choose the same $x$ in the left and right. The inequality in \eqref{2j2} holds as the norm is submultiplicative and the equality in \eqref{2j3} holds as we assume $\sigma < 1$ which means the series is the geometric series. This is also the condition for the sum to converge to $M^*$. If $\sigma \geq 1$ then the sum diverges therefore there is no closed form solution for the error-term.
+
+\subsection*{k)}
+\begin{align}
+    \mathcal{O} \left( \frac{\sigma^{K+1}}{1-\sigma} \right) =  \mathcal{O} \left(\sigma^{K+1}\right)
+\end{align}
+Where $\sigma < 1$.
+As this error term decayes exponentially fast we can say that the error term is acceptable and the truncation is a good approximation.
 \end{document}
 
 %%% Local Variables:
