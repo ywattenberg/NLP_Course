@@ -1,0 +1,100 @@
+\documentclass[a4paper,12pt]{ETHexercise}
+\usepackage{bbm}
+
+\input{preamble}
+
+\usepackage{multirow}
+\title{NLP Assignment}
+\begin{document}
+\setserie{1}
+
+
+
+\lectureheader{Prof. Ryan Cotterell}
+{}
+{\Large Natural Language Processing}{Fall 2022}
+\begin{center}
+    {\Huge Yannick Wattenberg: Assignment 04}\\
+      \quad\newline
+      ywattenberg@inf.ethz.ch, 19-947-464.\\
+      \quad\newline
+    \timestamp
+
+\end{center}
+\section*{Question 1: Calculating Prefix Probabilities}
+\subsection*{a)}
+We prove by 
+The following equality is given
+\begin{align}
+    \sum_{w \in \Sigma} p(w) = 1 \label{eq:g1}
+\end{align}
+We first prove the following equivalence:
+\begin{align}
+    \sum_{w \in \Sigma^*, |w| = n} \tilde{p}(w) = 1
+\end{align}
+Using induction over n and the above equation as induction hypothesis.
+\begin{align}
+    \sum_{w \in \Sigma^*, |w| = 1} \tilde{p}(w) &= \sum_{w \in \Sigma} p(w) = 1\\
+    n &\rightarrow n+1 \nonumber\\
+    \sum_{w \in \Sigma^*, |w| = n+1} \tilde{p}(w) &=  \sum_{w' \in \Sigma}\sum_{w \in \Sigma^*, |w| = n} \tilde{p}(w' \circ w)\\
+    &= \sum_{w' \in \Sigma}\sum_{w \in \Sigma^*, |w| = n} p(w')\tilde{p}(w) &&\text{def. }\tilde{p}\\
+    &= \sum_{w' \in \Sigma}  p(w') \cdot \sum_{w \in \Sigma^*, |w| = n}\tilde{p}(w)\\
+    &= \sum_{w' \in \Sigma}  p(w') &&(IH)\\
+    &= 1 &&\ref{eq:g1}
+\end{align}
+
+With this we can reformulate the sum as follows:
+\begin{align}
+    \sum_{w \in \Sigma^*} \tilde{p}(w) &= \sum_{i=0}^{\infty} \sum_{w \in \Sigma^*, |w| = i} \tilde{p}(w)\\
+    &=   \sum_{i=0}^{\infty} \sum_{w \in \Sigma^*, |w| = i} \tilde{p}(w)\\
+    &=   \sum_{i=0}^{\infty} 1\\
+     \sum_{i=1}^{\infty} 1 &\rightarrow \infty
+\end{align}
+
+\subsection*{b)}
+The following equality is given
+\begin{align}
+    \sum_{w \in \Sigma \cup EOS} p(w) = 1 \Rightarrow \sum_{w \in \Sigma} p(w) = 1 - P(EOS) \label{eq:g2}
+\end{align}
+We first prove the following equivalence:
+\begin{align}
+    \sum_{w \in \Sigma^*, |w| = n} \tilde{p}(w) = (1 - P(EOS))^n
+\end{align}
+Using induction over n and the above equation as induction hypothesis.
+\begin{align}
+    \sum_{w \in \Sigma^*, |w| = 1} \tilde{p}(w) &= \sum_{w \in \Sigma} p(w) = 1 - P(EOS) &&\ref{eq:g2} \\
+    n &\rightarrow n+1 \nonumber\\
+    \sum_{w \in \Sigma^*, |w| = n+1} \tilde{p}(w) &=  \sum_{w' \in \Sigma}\sum_{w \in \Sigma^*, |w| = n} \tilde{p}(w' \circ w)\\
+    &= \sum_{w' \in \Sigma}\sum_{w \in \Sigma^*, |w| = n} p(w')\tilde{p}(w) &&\text{def. }\tilde{p}\\
+    &= \sum_{w' \in \Sigma}  p(w') \cdot \sum_{w \in \Sigma^*, |w| = n}\tilde{p}(w)\\
+    &= \sum_{w' \in \Sigma}  p(w') \cdot (1-P(EOS))^n &&(IH)\\
+    &=  (1-P(EOS)) \cdot (1-P(EOS))^n &&\ref{eq:g2}\\
+    &= (1-P(EOS))^{n+1}
+\end{align}
+
+With this we can reformulate the sum as follows:
+\begin{align}
+    \sum_{w \in \Sigma^*} p(w) = \sum_{w \in \Sigma^*} p(EOS) \tilde{p}(w)  &= p(EOS) \sum_{i=0}^{\infty} \sum_{w \in \Sigma^*, |w| = i} \tilde{p}(w)\\
+    &= P(EOS)  \left(\sum_{i=0}^{\infty} \sum_{w \in \Sigma^*, |w| = i} \tilde{p}(w)\right)\\
+    &= P(EOS)  \left(\sum_{i=0}^{\infty} (1-P(EOS))^{i} \right)\\
+     P(EOS) \left(  \sum_{i=0}^{\infty} (1-P(EOS))^{i} \right) &\rightarrow P(EOS)  \frac{1}{P(EOS)} = 1 \quad (\text{geom. series})
+\end{align}
+
+\subsection*{c)}
+\begin{align}
+    P_{pre}(w) &\stackrel{!}{=} \sum_{u\in\Sigma^*}p(wu)\\
+    \sum_{u\in\Sigma^*}p(wu) &= \sum_{u \in \Sigma^*}P(EOS|wu)P_{pre}(u|w)P_{pre}(w)\\
+    &= P_{pre}(w) \left(\sum_{u \in \Sigma^*}P(EOS|wu)P_{pre}(u|w)\right)\\
+    &= \frac{1}{P(EOS|w)} P(w) \left(\sum_{u \in \Sigma^*}P(u|w)\right) &&(\text{def.} P)\\
+    &= \frac{1}{P(EOS|w)} \left(\sum_{u \in \Sigma^*}P(w)\frac{P(w|u)P(u)}{P(w)}\right) &&(\text{Bayes.}) \label{eq:bayes}\\
+    &= \frac{1}{P(EOS|w)} \left(\sum_{u \in \Sigma^*}P(w|u)P(u)\right) \\
+    &= \frac{1}{P(EOS|w)} P(w) &&(\text{Bayes.})\\
+    &= P_{pre}(w) &&(\text{def.} P)
+\end{align}
+In (\ref{eq:bayes}) we apply baysens rule which holds as the sum iterates over all possible suffixes. This means we sum over the whole probability space which gives probability one for the event we condition on.
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
