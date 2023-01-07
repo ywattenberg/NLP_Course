@@ -54,44 +54,64 @@ With this we can reformulate the sum as follows:
 \subsection*{b)}
 The following equality is given
 \begin{align}
-    \sum_{w \in \Sigma \cup EOS} p(w) = 1 \Rightarrow \sum_{w \in \Sigma} p(w) = 1 - P(EOS) \label{eq:g2}
+    \sum_{w \in \Sigma \cup EOS} p(w) = 1 \Rightarrow \sum_{w \in \Sigma} p(w) = 1 - p(EOS) \label{eq:g2}
 \end{align}
 We first prove the following equivalence:
 \begin{align}
-    \sum_{w \in \Sigma^*, |w| = n} \tilde{p}(w) = (1 - P(EOS))^n
+    \sum_{w \in \Sigma^*, |w| = n} \tilde{p}(w) = (1 - p(EOS))^n
 \end{align}
 Using induction over n and the above equation as induction hypothesis.
 \begin{align}
-    \sum_{w \in \Sigma^*, |w| = 1} \tilde{p}(w) &= \sum_{w \in \Sigma} p(w) = 1 - P(EOS) &&\ref{eq:g2} \\
+    \sum_{w \in \Sigma^*, |w| = 1} \tilde{p}(w) &= \sum_{w \in \Sigma} p(w) = 1 - p(EOS) &&\ref{eq:g2} \\
     n &\rightarrow n+1 \nonumber\\
     \sum_{w \in \Sigma^*, |w| = n+1} \tilde{p}(w) &=  \sum_{w' \in \Sigma}\sum_{w \in \Sigma^*, |w| = n} \tilde{p}(w' \circ w)\\
     &= \sum_{w' \in \Sigma}\sum_{w \in \Sigma^*, |w| = n} p(w')\tilde{p}(w) &&\text{def. }\tilde{p}\\
     &= \sum_{w' \in \Sigma}  p(w') \cdot \sum_{w \in \Sigma^*, |w| = n}\tilde{p}(w)\\
-    &= \sum_{w' \in \Sigma}  p(w') \cdot (1-P(EOS))^n &&(IH)\\
-    &=  (1-P(EOS)) \cdot (1-P(EOS))^n &&\ref{eq:g2}\\
-    &= (1-P(EOS))^{n+1}
+    &= \sum_{w' \in \Sigma}  p(w') \cdot (1-p(EOS))^n &&(IH)\\
+    &=  (1-p(EOS)) \cdot (1-p(EOS))^n &&\ref{eq:g2}\\
+    &= (1-p(EOS))^{n+1}
 \end{align}
 
 With this we can reformulate the sum as follows:
 \begin{align}
     \sum_{w \in \Sigma^*} p(w) = \sum_{w \in \Sigma^*} p(EOS) \tilde{p}(w)  &= p(EOS) \sum_{i=0}^{\infty} \sum_{w \in \Sigma^*, |w| = i} \tilde{p}(w)\\
-    &= P(EOS)  \left(\sum_{i=0}^{\infty} \sum_{w \in \Sigma^*, |w| = i} \tilde{p}(w)\right)\\
-    &= P(EOS)  \left(\sum_{i=0}^{\infty} (1-P(EOS))^{i} \right)\\
-     P(EOS) \left(  \sum_{i=0}^{\infty} (1-P(EOS))^{i} \right) &\rightarrow P(EOS)  \frac{1}{P(EOS)} = 1 \quad (\text{geom. series})
+    &= p(EOS)  \left(\sum_{i=0}^{\infty} \sum_{w \in \Sigma^*, |w| = i} \tilde{p}(w)\right)\\
+    &= p(EOS)  \left(\sum_{i=0}^{\infty} (1-p(EOS))^{i} \right)\\
+     p(EOS) \left(  \sum_{i=0}^{\infty} (1-p(EOS))^{i} \right) &\rightarrow p(EOS)  \frac{1}{p(EOS)} = 1 \quad (\text{geom. series})
 \end{align}
 
 \subsection*{c)}
 \begin{align}
-    P_{pre}(w) &\stackrel{!}{=} \sum_{u\in\Sigma^*}p(wu)\\
-    \sum_{u\in\Sigma^*}p(wu) &= \sum_{u \in \Sigma^*}P(EOS|wu)P_{pre}(u|w)P_{pre}(w)\\
-    &= P_{pre}(w) \left(\sum_{u \in \Sigma^*}P(EOS|wu)P_{pre}(u|w)\right)\\
-    &= \frac{1}{P(EOS|w)} P(w) \left(\sum_{u \in \Sigma^*}P(u|w)\right) &&(\text{def.} P)\\
-    &= \frac{1}{P(EOS|w)} \left(\sum_{u \in \Sigma^*}P(w)\frac{P(w|u)P(u)}{P(w)}\right) &&(\text{Bayes.}) \label{eq:bayes}\\
-    &= \frac{1}{P(EOS|w)} \left(\sum_{u \in \Sigma^*}P(w|u)P(u)\right) \\
-    &= \frac{1}{P(EOS|w)} P(w) &&(\text{Bayes.})\\
-    &= P_{pre}(w) &&(\text{def.} P)
+    p_{pre}(w) &\stackrel{!}{=} \sum_{u\in\Sigma^*}p(wu)\\
+    \sum_{u\in\Sigma^*}p(wu) &= \sum_{u \in \Sigma^*}p(EOS|wu)p_{pre}(u|w)p_{pre}(w)\\
+    &= p_{pre}(w) \left(\sum_{u \in \Sigma^*}p(EOS|wu)p_{pre}(u|w)\right)\\
+    &= \frac{1}{p(EOS|w)} p(w) \left(\sum_{u \in \Sigma^*}p(u|w)\right) &&(\text{def.} P)\\
+    &= \frac{1}{p(EOS|w)} \left(\sum_{u \in \Sigma^*}p(w)\frac{p(w|u)p(u)}{p(w)}\right) &&(\text{Bayes.}) \label{eq:bayes}\\
+    &= \frac{1}{p(EOS|w)} \left(\sum_{u \in \Sigma^*}p(w|u)p(u)\right) \\
+    &= \frac{1}{p(EOS|w)} p(w) &&(\text{Bayes.})\\
+    &= p_{pre}(w) &&(\text{def.} P)
 \end{align}
 In (\ref{eq:bayes}) we apply baysens rule which holds as the sum iterates over all possible suffixes. This means we sum over the whole probability space which gives probability one for the event we condition on.
+
+\subsection*{d)}
+One can use the normal CKY algorithm where we define the score-function as the natural logarithm of the probability of the applied rule.
+This means the CKY algorithm will calculate
+\begin{align}
+   chart[i,k,X] \mathrel{+}= &exp(score(X\rightarrow Y Z)) \cdot chart[i,j,Y] \cdot chart[j,k,Z] \\
+    = &p( Y Z| X) \cdot p(Y|w_i,...,w_j) \cdot p(Z|w_j,...,w_k)\\
+    \Rightarrow chart[i,k,X] = &p(X|w_i,...,w_k)
+\end{align}
+Which gives us $p(w_1,...,w_n|S)$ for the top most cell. This is the Prefix probability of the sentence we can multiply this by $p(EOS|S)$ to get the probability of the sentence.
+
+\subsection*{e)}
+\begin{align}
+    \sum_{u \in \Sigma^*}p(wu) &\stackrel{!}{=} p(S \stackrel{*}{\Rightarrow} wv)\\
+    \sum_{u \in \Sigma^*}p(wu) &= \sum_{u \in \Sigma^*} p_{inside}(wu|S) &&(\text{S is the starting symbol})\\
+    &= \sum_{u \in \Sigma^*} p(S \stackrel{*}{\Rightarrow} wu) &&(\text{def. }p_{inside})\\
+    &= \sum_{u \in \Sigma^*} p(S \stackrel{*}{\Rightarrow} X\alpha=-) p(X \stackrel{*}{\Rightarrow} w) &&(\text{def. }p_{inside})\\
+    &= p(S \stackrel{*}{\Rightarrow} wv) &&(\text{for some arbitrary }v \in \Sigma^*)
+\end{align}
+In the last step we replace the sum by some arbitrary suffix $v$. This is possible as the sum iterates over all possible suffixes and ($\stackrel{!}{\Rightarrow}$) produces all possible derivations meaning it also generates all possible suffixes.
 \end{document}
 
 %%% Local Variables:
