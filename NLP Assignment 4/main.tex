@@ -108,10 +108,30 @@ Which gives us $p(w_1,...,w_n|S)$ for the top most cell. This is the Prefix prob
     \sum_{u \in \Sigma^*}p(wu) &\stackrel{!}{=} p(S \stackrel{*}{\Rightarrow} wv)\\
     \sum_{u \in \Sigma^*}p(wu) &= \sum_{u \in \Sigma^*} p_{inside}(wu|S) &&(\text{S is the starting symbol})\\
     &= \sum_{u \in \Sigma^*} p(S \stackrel{*}{\Rightarrow} wu) &&(\text{def. }p_{inside})\\
-    &= \sum_{u \in \Sigma^*} p(S \stackrel{*}{\Rightarrow} X\alpha=-) p(X \stackrel{*}{\Rightarrow} w) &&(\text{def. }p_{inside})\\
     &= p(S \stackrel{*}{\Rightarrow} wv) &&(\text{for some arbitrary }v \in \Sigma^*)
 \end{align}
 In the last step we replace the sum by some arbitrary suffix $v$. This is possible as the sum iterates over all possible suffixes and ($\stackrel{!}{\Rightarrow}$) produces all possible derivations meaning it also generates all possible suffixes.
+
+\subsection*{f)}
+First we define the probability matrix $W$ of size $|\mathcal{N}| \times |\mathcal{N}|$ as follows: Every entry $W[A,B]$ gets the probability of $p[A \Rightarrow B\alpha]$ where $\alpha$ is the rest of the rule. We can calculate this probability by adding the probabilities of all rules which produce $B$ as a first symbol. There can be at most $|\mathcal{N}|$ such rules as our grammar is in Chomsky normal form.
+This means it is possible to calculate all entries of the matrix $W$ in $\mathcal{O}(|\mathcal{N}|^3)$.
+
+Now we have to calculate $W^*$. We can do this using Lehmann's algorithm as seen in the lecture notes. For this to work it has to hold that entries on the diagonal of $W$ are smaller than one, otherwise $W[A,A]^*$ would be infinity/diverge. However all entries on the diagonal have to be smaller than one as otherwise this would mean all derivations from $A$ produce another $A$ thus every sentence would be infinite, which we assume to not be the case. So we can use Lehmann's algorithm to calculate $W^*$ which runs in $\mathcal{O}(|\mathcal{N}|^3)$.
+Now the entry $W^*[A,B]$ is the probability of $p[A  \stackrel{*}{\Rightarrow} B\alpha] = p_{lc}(B|A)$. This follows from the definition of $W^*$ and the definition of the matrix product. We already proved in Assignment 3 exercise 2 b) that $M^n$ encodes the sum of path lengths of length $n$ in the graph $M$, this translates to our example where the path length will be the probabilities of a specific derivation path.
+Then it follows from the definition of $W^*$ that $W^*[A,B]$ is the sum of probabilities of a derivation path from $A$ to $B$ of length $n$ for $n$ from $0$ to $\infty$. This is the same as $p_{lc}(B|A)$.
+Now with all $p_{lc}(B|A)$ calculated we can calculate $p_{lc}(YZ|X) = \sum_{X' \in \mathcal{N}} p_{lc}(X'|X)p(X' \Rightarrow YZ)$ which is in $\mathcal{O}(|\mathcal{N}|)$. Doing this for all entries will take $\mathcal{O}(|\mathcal{N}|^4)$ as we have to calculate the sum for all possible $X$, $Y$ and $Z$.
+
+\subsection*{g)}
+\begin{align*}
+    p_{pre}(w_i,...,w_k|X) \stackrel{!}{=} \sum_{j=1}^{k-1}\sum_{Y,Z\in\mathcal{N}}p_{lc}(YZ|X)\cdot p_{inside}(w_i,...,w_j|Y)\cdot p_{pre}(w_j+1,...,w_k|Z)
+\end{align*}
+\begin{align}
+    &\sum_{j=1}^{k-1}\sum_{Y,Z\in\mathcal{N}}p_{lc}(YZ|X)\cdot p_{inside}(w_i,...,w_j|Y)\cdot p_{pre}(w_j+1,...,w_k|Z)\\
+    =&\sum_{j=1}^{k-1}\sum_{Y,Z\in\mathcal{N}}p(X \stackrel{*}{\Rightarrow} YZ\alpha)\cdot p(Y \stackrel{*}{\Rightarrow} w_i,...,w_j)\cdot p(Z \stackrel{*}{\Rightarrow} w_{j+1},...,w_k,\textbf{v})\\
+    =&p(X \stackrel{*}{\Rightarrow} w_i,...,w_k,\textbf{v})\label{eq:big} \\
+    =&p_{pre}(w_i,...,w_k|X)
+\end{align}
+The important step here is (\ref{eq:big}) the step to this equation holds as we some 
 \end{document}
 
 %%% Local Variables:
