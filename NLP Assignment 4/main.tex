@@ -128,10 +128,26 @@ Now with all $p_{lc}(B|A)$ calculated we can calculate $p_{lc}(YZ|X) = \sum_{X' 
 \begin{align}
     &\sum_{j=1}^{k-1}\sum_{Y,Z\in\mathcal{N}}p_{lc}(YZ|X)\cdot p_{inside}(w_i,...,w_j|Y)\cdot p_{pre}(w_j+1,...,w_k|Z)\\
     =&\sum_{j=1}^{k-1}\sum_{Y,Z\in\mathcal{N}}p(X \stackrel{*}{\Rightarrow} YZ\alpha)\cdot p(Y \stackrel{*}{\Rightarrow} w_i,...,w_j)\cdot p(Z \stackrel{*}{\Rightarrow} w_{j+1},...,w_k,\textbf{v})\\
-    =&p(X \stackrel{*}{\Rightarrow} w_i,...,w_k,\textbf{v})\label{eq:big} \\
+\end{align}
+Further we have:
+\begin{align}
+    &p(X \stackrel{*}{\Rightarrow} Y'Z'\alpha)\cdot p(Y' \stackrel{*}{\Rightarrow} w_i,...,w_{j'})\cdot p(Z' \stackrel{*}{\Rightarrow} w_{j'+1},...,w_k,\textbf{v'})\\
+    = &p(X \stackrel{*}{\Rightarrow} w_i,...,w_k,\textbf{v}) \label{eq:big}\\
+    - &\left( \sum_{j=1, j \neq j'}^{k-1}\sum_{Y,Z\in\mathcal{N}; Y\neq Y', Z \neq Z' }p(X \stackrel{*}{\Rightarrow} YZ\alpha)\cdot p(Y \stackrel{*}{\Rightarrow} w_i,...,w_j)\cdot p(Z \stackrel{*}{\Rightarrow} w_{j+1},...,w_k,\textbf{v}) \right) \\
+    \Rightarrow &\sum_{j=1}^{k-1}\sum_{Y,Z\in\mathcal{N}}p(X \stackrel{*}{\Rightarrow} YZ\alpha)\cdot p(Y \stackrel{*}{\Rightarrow} w_i,...,w_j)\cdot p(Z \stackrel{*}{\Rightarrow} w_{j+1},...,w_k,\textbf{v})\\
+    = &p(X \stackrel{*}{\Rightarrow} w_i,...,w_k,\textbf{v}) \\
     =&p_{pre}(w_i,...,w_k|X)
 \end{align}
-The important step here is (\ref{eq:big}) the step to this equation holds as we some 
+The important step here is equality of (\ref{eq:big}) and the previous equation. Which is valid as $p(X \stackrel{*}{\Rightarrow} w_i,...,w_k,\textbf{v})$ is the sum of the probabilities of all derivation trees of $w_i, ..., w_k,,\textbf{v} $. Further the previous equation is the probability of deriving $w_i,...,w_j$ from Y', $w_i,...,w_k,\textbf{v}$ from Z' and Z'Y'$\alpha$ from X. This corresponds to the probabilities of the trees seen in figure 1: b).  Thus in (\ref{eq:big}) we calculate the difference between all possible derivation trees and the derivation trees that we are not intrested in i.e. the ones that do not the ones just mentioned. 
+
+\subsection*{h)}
+Using f) we can calculate the left corner probabilities in $\mathcal{O}(|\mathcal{N}|^4)$. After that we can calculate $p_{pre}(w_k|X)$ as follows:
+\begin{align}
+    p_{pre}(w_k|X) = p_{pre}(X \stackrel{*}{\Rightarrow} w_k) = \sum_{Y \in \mathcal{N}}p_{lc}(Y|X)p(Y \Rightarrow w_k)
+\end{align}
+This is possible in $\mathcal{O}(|\mathcal{N}|)$ as we can have at most one rule per nonterminal that derives the terminal $w_k$.
+
+Now we can use the CKY algorithm to calculate all prefix probabilities for all prefix sequences of $w_1,...,w_N$ in $\mathcal{O}(N^3|\mathcal{N}|^3)$.
 \end{document}
 
 %%% Local Variables:
