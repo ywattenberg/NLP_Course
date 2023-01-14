@@ -147,7 +147,14 @@ Using f) we can calculate the left corner probabilities in $\mathcal{O}(|\mathca
 \end{align}
 This is possible in $\mathcal{O}(|\mathcal{N}|)$ as we can have at most one rule per nonterminal that derives the terminal $w_k$.
 
-Now we can use the CKY algorithm to calculate all prefix probabilities for all prefix sequences of $w_1,...,w_N$ in $\mathcal{O}(N^3|\mathcal{N}|^3)$.
+Now we can calculate $p_{pre}$ just calcualte the sums as one would do naivly.
+However we have to do so in 
+use calculate all prefix probabilities for all prefix sequences of $w_1,...,w_N$ in $\mathcal{O}(N^3|\mathcal{N}|^3)$. Where we calcutate the outer sum in reverse order meaning we start with $i=k-1$
+as the we need the previously calculated values 
+
+
+\subsection{i)}
+
 \end{document}
 
 %%% Local Variables:
