@@ -145,15 +145,40 @@ Using f) we can calculate the left corner probabilities in $\mathcal{O}(|\mathca
 \begin{align}
     p_{pre}(w_k|X) = p_{pre}(X \stackrel{*}{\Rightarrow} w_k) = \sum_{Y \in \mathcal{N}}p_{lc}(Y|X)p(Y \Rightarrow w_k)
 \end{align}
-This is possible in $\mathcal{O}(|\mathcal{N}|)$ as we can have at most one rule per nonterminal that derives the terminal $w_k$.
+This is possible in $\mathcal{O}(|\mathcal{N}|)$ as we can have at most one rule per nonterminal that derives the terminal $w_k$. Thus we can calculate $p_{pre}(w_k|X)$ for all $X \in \mathcal{N}$ in $\mathcal{O}(|\mathcal{N}|^2)$. 
+We can also compute the inside probabilities for all substrings of $w_i,...,w_{k-1}$ and tags in $\mathcal{O}(N^3|\mathcal{R}|) = \mathcal{O}(N^3|\mathcal{N}|^3)$ using the CKY algorithm with the score function defined as the $ln$ of probability of the derivation rule. We also return the whole chart instead of just $chart[1,N+1,S]$. Thus in $chart[j,i,X]$ we have the probability of deriving $w_j,...,w_i$ from $X$. 
 
-Now we can calculate $p_{pre}$ just calcualte the sums as one would do naivly.
-However we have to do so in 
-use calculate all prefix probabilities for all prefix sequences of $w_1,...,w_N$ in $\mathcal{O}(N^3|\mathcal{N}|^3)$. Where we calcutate the outer sum in reverse order meaning we start with $i=k-1$
-as the we need the previously calculated values 
+Now we can calculate the prefix probabilities $p_{pre}(w_l, w_k | X)$ for all X for $l$ from $k-1$ to $i$. We have all probabilities in the sums precomputed for $l = k-1$. For each we need to iterate over all $j$ in range $[l,k-1]$ and all $Y,Z$. The outer sum iterates over at most $N$ elements while the inner sum iterates over less than $|N|^2$ elements. Thus the entire sum will take at most $\mathcal{O}(N|\mathcal{N}|^2)$ to calculate. Calculating for all X gives us a runtime of $\mathcal{O}(N|\mathcal{N}|^2)$. From this follows that the whole suppart runs in $\mathcal{O}(N^2|\mathcal{N}|^3)$ as we need to compute this sum N times.
 
+Then the whole algorithm runs in $\mathcal{O}(N^2|\mathcal{N}|^3) + \mathcal{O}(N^3|\mathcal{N}|^3) + \mathcal{O}(|\mathcal{N}|^4) = \mathcal{O}(\mathcal{O}(N^3|\mathcal{N}|^3) + \mathcal{O}(|\mathcal{N}|^4))$
 
-\subsection{i)}
+Calling this algorithm for all prefixes of $\textbf{w}$ then gives a runtime of $\mathcal{O}(N^4|\mathcal{N}|^3 + N|\mathcal{N}|^4)$.
+
+\subsection*{i)}
+To make the previous algorithm more efficient we can instead use the CKY algorithm to calculate the prefix probabilities. The precomputations are the same as before, we calculate the left corner probabilities, the inside probabilities. We also now have to precompute the prefix probabilities for all of the terminals in $\textbf{w}$ thus instead of $\mathcal{O}(|\mathcal{N}|^2)$ we get $\mathcal{O}(N |\mathcal{N}|^2)$.
+Next we use the CKY algorithm to calculate the rest of the prefix probabilities, $chart[n,n+1, X]$ will be initialized to $p_{pre}(w_n|X)$. Then given the previous levels of prefix probabilities we calculate the current level as follows:
+\begin{align}
+    chart[n, l, X] = \sum_{j=i}^{l-1}\sum_{Y,Z\in\mathcal{N}}p_{lc}(YZ|X)p_{inside}(w_n,...,w_j|Y)chart[j+1,l,Z]
+\end{align}
+It is obvious that $chart[n, l, X] = p_{pre}(w_n,...,w_l|X)$. We can prove this by strong induction. The base case of $l = n+1$ is trivial as we initialized the chart to hold the prefix probabilities. For our induction assumption we assume that $chart[i, j, X] = p_{pre}(w_i,...,w_j|X)$ for all $i,j; j - i < l - n$ and all $X \in \mathcal{N}$. Then we can calculate $chart[n, l, X]$ as stated:
+\begin{align}
+    chart[n, l, X] &= \sum_{j=i}^{l-1}\sum_{Y,Z\in\mathcal{N}}p_{lc}(YZ|X)p_{inside}(w_n,...,w_j|Y)chart[j+1,l,Z]\\
+    &= \sum_{j=i}^{l-1}\sum_{Y,Z\in\mathcal{N}}p_{lc}(YZ|X)p_{inside}(w_n,...,w_j|Y)p_{pre}(w_{j+1},...,w_l|Z) &&(\text{IH})\\
+    &= p_{pre}(w_n,...,w_l|X) &&(\text{def }p_{pre})
+\end{align}
+Then as we have used the CKY algorithm the runtime is $\mathcal{O}(N^3|\mathcal{N}|^3)$.
+This gives us a runtime of $\mathcal{O}(N^3|\mathcal{N}|^3 + |\mathcal{N}|^4)$.
+
+\subsection*{j)}
+\begin{align}
+    p_{pre}(w) &= \prod_{n=1}^N p(w_n|w_0,...,w_{n-1})\\
+    \Rightarrow p_{pre}(w_j|w_0,...,w_{j-1}) &= 
+    \frac{p_{pre}(w)}{\prod_{n=1, n \neq j}^N p(w_n|w_0,...,w_{n-1})}\\
+    &=\frac{p_{pre}(w)}{p_{pre}(w_0,...,w_{j-1}) \frac{p_{pre}(w)}{p_{pre}(w_0,...,w_{j+1})}}\\
+    &= \frac{p(S \stackrel{*}{\Rightarrow} \textbf{wv})}{p(S \stackrel{*}{\Rightarrow} w_0,...,w_{j-1}\textbf{v}) \frac{p(S \stackrel{*}{\Rightarrow} \textbf{wv})}{p(S \stackrel{*}{\Rightarrow} w_0,...,w_{j+1}\textbf{v})}}\\
+    &= \frac{p(S \stackrel{*}{\Rightarrow} w_0,...,w_{j+1}\textbf{v})}{p(S \stackrel{*}{\Rightarrow} w_0,...,w_{j-1}\textbf{v})}\\
+    &= \frac{p_{pre}(w_0,...,w_{j+1})}{p_{pre}(w_0,...,w_{j-1})}
+\end{align}
 
 \end{document}
 
