@@ -279,7 +279,7 @@ The proof for Viterbi's algorithm is simple we assume that $\gamma[i,t']$ corres
 Resulting in a contradiction and proving that the entries of $\gamma$ are the best part of part-of-speech tagging of length $i$ ending with tag $t$ at $\langle i, t\rangle$.
 
 Assume that $\gamma[i,t]$ corresponding to the tagging $T_{1:i}$ is not the score of the best part-of-speech tagging of length $i$ ending with tag $t$. From this follows that the first popped pair for $\langle i, t\rangle$ was not the best part-of-speech tagging of length $i$ ending with tag $t$. Let $T'_{1:i}$ be the best part-of-speech tagging of length $i$ ending with tag $t$.
-Then as we argued in a) the scores of all $T'_{1:j}; \forall j , 1 \leq j \leq i$ have to be greater than the score of $T'_{1:i}$ this means that $\langle i, t\rangle$ would not be popped before all of $\langle j, t_j\rangle, j \in [1,...,i]$ have been popped this means that $\gamma[i,t]$ would be set to the score of the tagging $T'$ and not $T$.
+Then as we argued in a) the scores of all $T'_{1:j}; \forall j, 1 \leq j \leq i$ have to be greater than the score of $T'_{1:i}$ this means that $\langle i, t\rangle$ would not be popped before all of $\langle j, t_j\rangle, j \in [1,...,i]$ have been popped this means that $\gamma[i,t]$ would be set to the score of the tagging $T'$ and not $T$.
 
 Resulting in a contradiction and proving that the entries of $\gamma$ are the best part of part-of-speech tagging of length $i$ ending with tag $t$ at $\langle i, t\rangle$ and that the entries of $\gamma$ induced by Viterbi's and Dijkstra's algorithms are the same.
 
